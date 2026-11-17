@@ -7,12 +7,12 @@ import { EmptyState, ErrorAlert, Spinner, WhatsAppLink } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 import { useBranding } from '../context/BrandingContext'
 import { useWhatsapp } from '../hooks/useWhatsapp'
-import { getProductos } from '../lib/data'
+import { defaultBranding, getProductos } from '../lib/data'
 import { CATEGORIAS, type Categoria, type Producto } from '../types'
 
 export default function Catalogo() {
   const { isAdmin } = useAuth()
-  const { bannerUrl } = useBranding()
+  const { branding, bannerUrl } = useBranding()
   const wa = useWhatsapp()
   const [productos, setProductos] = useState<Producto[]>([])
   const [loading, setLoading] = useState(true)
@@ -42,15 +42,14 @@ export default function Catalogo() {
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-2 md:items-center md:py-20">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
-              <Smartphone className="h-4 w-4" /> Reparación y accesorios
+              <Smartphone className="h-4 w-4" />{' '}
+              {branding.hero_etiqueta || defaultBranding.hero_etiqueta}
             </span>
             <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-              Tu teléfono, en buenas manos
+              {branding.hero_titulo || defaultBranding.hero_titulo}
             </h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-brand-50">
-              Servicio Tecnico Walter Molares. Elegí el servicio o producto que necesitás y
-              escribinos por WhatsApp: el mensaje ya incluye el código y el precio para que
-              sepas exactamente de qué se trata.
+            <p className="mt-4 max-w-xl whitespace-pre-line text-base leading-7 text-brand-50">
+              {branding.hero_descripcion || defaultBranding.hero_descripcion}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <button
@@ -60,11 +59,11 @@ export default function Catalogo() {
                 }
                 className="btn-ghost border-0 bg-white text-brand-700 hover:bg-brand-50"
               >
-                Ver servicios
+                {branding.hero_boton_servicios || defaultBranding.hero_boton_servicios}
               </button>
               <WhatsAppLink
                 href={wa.general()}
-                label="Escribinos por WhatsApp"
+                label={branding.hero_boton_whatsapp || defaultBranding.hero_boton_whatsapp}
                 className="btn-whatsapp"
               />
             </div>
@@ -94,9 +93,11 @@ export default function Catalogo() {
       <section id="servicios" className="mx-auto max-w-7xl px-4 py-12">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Servicios y productos</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Precios de referencia. Confirmá disponibilidad al escribirnos.
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              {branding.servicios_titulo || defaultBranding.servicios_titulo}
+            </h2>
+            <p className="mt-1 whitespace-pre-line text-sm text-slate-500">
+              {branding.servicios_descripcion || defaultBranding.servicios_descripcion}
             </p>
           </div>
           {isAdmin && (

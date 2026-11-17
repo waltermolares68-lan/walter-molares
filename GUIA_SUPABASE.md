@@ -11,7 +11,7 @@ Seguí estos pasos una sola vez. Después, el sistema queda funcionando en la we
 3. Copiá TODO el contenido de `supabase/schema.sql` de este repositorio y pegalo en el editor.
 4. Presioná **Run**. Debe aparecer `Success. No rows returned` y luego los datos de ejemplo.
 5. Verificá en **Table Editor** que existan las tablas `productos`, `clientes`, `ordenes` y `branding`.
-6. Verificá en la tabla `branding` las columnas `logo_url`, `banner_url`, `whatsapp`, `instagram`, `facebook`, `tiktok`, `youtube`, `direccion`, `mapa_url` y `horario`.
+6. Verificá en la tabla `branding` las columnas `logo_url`, `banner_url`, `whatsapp`, `instagram`, `facebook`, `tiktok`, `youtube`, `direccion`, `mapa_url`, `horario` y las de textos (`hero_etiqueta`, `hero_titulo`, `hero_descripcion`, `hero_boton_servicios`, `hero_boton_whatsapp`, `servicios_titulo`, `servicios_descripcion`).
 7. Verificá en **Storage** que exista el bucket público `imagenes`.
 
 > Si ya habías ejecutado el script antes, **volvé a ejecutarlo completo**: es seguro, no borra datos

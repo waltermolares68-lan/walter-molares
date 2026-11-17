@@ -3,7 +3,7 @@ import { Facebook, Instagram, Music2, Palette, Youtube } from 'lucide-react'
 import { ImageUpload } from '../components/ImageUpload'
 import { ErrorAlert, Field } from '../components/ui'
 import { useBranding } from '../context/BrandingContext'
-import { saveBranding } from '../lib/data'
+import { defaultBranding, saveBranding } from '../lib/data'
 import { whatsappGeneral } from '../lib/whatsapp'
 import type { BrandingInput } from '../types'
 
@@ -26,6 +26,13 @@ export default function Branding() {
   const [direccion, setDireccion] = useState(branding.direccion)
   const [mapaUrl, setMapaUrl] = useState(branding.mapa_url)
   const [horario, setHorario] = useState(branding.horario)
+  const [heroEtiqueta, setHeroEtiqueta] = useState(branding.hero_etiqueta || defaultBranding.hero_etiqueta)
+  const [heroTitulo, setHeroTitulo] = useState(branding.hero_titulo || defaultBranding.hero_titulo)
+  const [heroDescripcion, setHeroDescripcion] = useState(branding.hero_descripcion || defaultBranding.hero_descripcion)
+  const [heroBotonServicios, setHeroBotonServicios] = useState(branding.hero_boton_servicios || defaultBranding.hero_boton_servicios)
+  const [heroBotonWhatsapp, setHeroBotonWhatsapp] = useState(branding.hero_boton_whatsapp || defaultBranding.hero_boton_whatsapp)
+  const [serviciosTitulo, setServiciosTitulo] = useState(branding.servicios_titulo || defaultBranding.servicios_titulo)
+  const [serviciosDescripcion, setServiciosDescripcion] = useState(branding.servicios_descripcion || defaultBranding.servicios_descripcion)
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
@@ -41,6 +48,13 @@ export default function Branding() {
     setDireccion(branding.direccion)
     setMapaUrl(branding.mapa_url)
     setHorario(branding.horario)
+    setHeroEtiqueta(branding.hero_etiqueta || defaultBranding.hero_etiqueta)
+    setHeroTitulo(branding.hero_titulo || defaultBranding.hero_titulo)
+    setHeroDescripcion(branding.hero_descripcion || defaultBranding.hero_descripcion)
+    setHeroBotonServicios(branding.hero_boton_servicios || defaultBranding.hero_boton_servicios)
+    setHeroBotonWhatsapp(branding.hero_boton_whatsapp || defaultBranding.hero_boton_whatsapp)
+    setServiciosTitulo(branding.servicios_titulo || defaultBranding.servicios_titulo)
+    setServiciosDescripcion(branding.servicios_descripcion || defaultBranding.servicios_descripcion)
   }, [branding])
 
   const whatsappDigits = whatsapp.replace(/\D/g, '')
@@ -62,6 +76,13 @@ export default function Branding() {
       direccion: direccion.trim(),
       mapa_url: mapaUrl.trim(),
       horario: horario.trim(),
+      hero_etiqueta: heroEtiqueta.trim(),
+      hero_titulo: heroTitulo.trim(),
+      hero_descripcion: heroDescripcion.trim(),
+      hero_boton_servicios: heroBotonServicios.trim(),
+      hero_boton_whatsapp: heroBotonWhatsapp.trim(),
+      servicios_titulo: serviciosTitulo.trim(),
+      servicios_descripcion: serviciosDescripcion.trim(),
     }
 
     if (!payload.whatsapp) {
@@ -88,8 +109,8 @@ export default function Branding() {
           <Palette className="h-7 w-7 text-brand-600" /> Marca y presentación
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Cambiá el logo, el WhatsApp, las redes y la ubicación. Todo se refleja en el sitio al
-          instante, sin volver a publicar.
+          Cambiá el logo, los textos del inicio, el WhatsApp, las redes y la ubicación. Todo se
+          refleja en el sitio al instante, sin volver a publicar.
         </p>
       </div>
 
@@ -241,6 +262,39 @@ export default function Branding() {
               />
             </Field>
           </div>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="border-b border-slate-200 pb-2 text-base font-bold text-slate-900">
+            Textos de la pantalla de inicio
+          </h2>
+          <p className="text-xs text-slate-500">
+            Estos son los textos que ve cualquiera al abrir la web. Si dejás un campo vacío, se usa
+            el texto original.
+          </p>
+          <Field label="Etiqueta pequeña" hint="El texto que aparece arriba del título, al lado del icono de teléfono.">
+            <input className="input" value={heroEtiqueta} onChange={(e) => setHeroEtiqueta(e.target.value)} />
+          </Field>
+          <Field label="Título principal" hint="El texto grande del encabezado.">
+            <input className="input" value={heroTitulo} onChange={(e) => setHeroTitulo(e.target.value)} />
+          </Field>
+          <Field label="Descripción del encabezado" hint="El párrafo debajo del título. Podés usar enter para saltos de línea.">
+            <textarea className="input min-h-[100px]" value={heroDescripcion} onChange={(e) => setHeroDescripcion(e.target.value)} />
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Texto del botón «Ver servicios»">
+              <input className="input" value={heroBotonServicios} onChange={(e) => setHeroBotonServicios(e.target.value)} />
+            </Field>
+            <Field label="Texto del botón de WhatsApp">
+              <input className="input" value={heroBotonWhatsapp} onChange={(e) => setHeroBotonWhatsapp(e.target.value)} />
+            </Field>
+          </div>
+          <Field label="Título de la sección de servicios">
+            <input className="input" value={serviciosTitulo} onChange={(e) => setServiciosTitulo(e.target.value)} />
+          </Field>
+          <Field label="Descripción de la sección de servicios">
+            <textarea className="input min-h-[70px]" value={serviciosDescripcion} onChange={(e) => setServiciosDescripcion(e.target.value)} />
+          </Field>
         </section>
 
         <div className="flex justify-end border-t border-slate-200 pt-4">

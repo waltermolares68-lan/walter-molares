@@ -69,6 +69,13 @@ export interface Branding {
   direccion: string
   mapa_url: string
   horario: string
+  hero_etiqueta: string
+  hero_titulo: string
+  hero_descripcion: string
+  hero_boton_servicios: string
+  hero_boton_whatsapp: string
+  servicios_titulo: string
+  servicios_descripcion: string
   updated_at?: string
 }
 
@@ -84,4 +91,11 @@ export type BrandingInput = Pick<
   | 'direccion'
   | 'mapa_url'
   | 'horario'
+  | 'hero_etiqueta'
+  | 'hero_titulo'
+  | 'hero_descripcion'
+  | 'hero_boton_servicios'
+  | 'hero_boton_whatsapp'
+  | 'servicios_titulo'
+  | 'servicios_descripcion'
 >

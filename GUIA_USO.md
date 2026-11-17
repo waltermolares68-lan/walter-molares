@@ -121,6 +121,7 @@ En el menú **Marca** podés personalizar el sitio **sin volver a publicar**:
 - **WhatsApp**: cargá tu número **solo con números y código de país** (ejemplo `5491135834902`, sin el `+`). Todos los botones «Consultar por WhatsApp» del catálogo y del panel usan este número. El botón **«Probar número»** abre WhatsApp para que verifiques que es correcto.
 - **Redes sociales**: Instagram, Facebook, TikTok y YouTube. Pegá el enlace completo o solo tu usuario (ejemplo `@tuusuario`). Las que dejes vacías no se muestran. Aparecen en la sección **Contacto y redes** del catálogo y como iconos en el pie del sitio.
 - **Ubicación y horario**: dirección, enlace de Google Maps (o la dirección directamente) y horario de atención. Se muestra en la sección **Ubicación** del catálogo, con un enlace **«Cómo llegar»**.
+- **Textos de la pantalla de inicio**: podés cambiar la etiqueta pequeña, el título grande, el párrafo de presentación, el texto de los dos botones y el título/descripción de la sección «Servicios y productos». Si dejás un campo vacío, se usa el texto original.
 
 Tocá **«Guardar cambios»** y todo se ve enseguida en el sitio. Arriba del formulario hay una **vista previa** con el logo redondo, el número y los iconos de las redes cargadas.
 

@@ -263,6 +263,14 @@ export const defaultBranding: Branding = {
   direccion: '',
   mapa_url: '',
   horario: '',
+  hero_etiqueta: 'Reparación y accesorios',
+  hero_titulo: 'Tu teléfono, en buenas manos',
+  hero_descripcion:
+    'Servicio Tecnico Walter Molares. Elegí el servicio o producto que necesitás y escribinos por WhatsApp: el mensaje ya incluye el código y el precio para que sepas exactamente de qué se trata.',
+  hero_boton_servicios: 'Ver servicios',
+  hero_boton_whatsapp: 'Escribinos por WhatsApp',
+  servicios_titulo: 'Servicios y productos',
+  servicios_descripcion: 'Precios de referencia. Confirmá disponibilidad al escribirnos.',
 }
 
 export async function getBranding(): Promise<Branding> {

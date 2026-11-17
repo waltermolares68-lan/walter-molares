@@ -105,6 +105,15 @@ alter table public.branding add column if not exists direccion text not null def
 alter table public.branding add column if not exists mapa_url text not null default '';
 alter table public.branding add column if not exists horario text not null default '';
 
+-- Textos editables del catálogo (encabezado y sección de servicios).
+alter table public.branding add column if not exists hero_etiqueta text not null default 'Reparación y accesorios';
+alter table public.branding add column if not exists hero_titulo text not null default 'Tu teléfono, en buenas manos';
+alter table public.branding add column if not exists hero_descripcion text not null default 'Servicio Tecnico Walter Molares. Elegí el servicio o producto que necesitás y escribinos por WhatsApp: el mensaje ya incluye el código y el precio para que sepas exactamente de qué se trata.';
+alter table public.branding add column if not exists hero_boton_servicios text not null default 'Ver servicios';
+alter table public.branding add column if not exists hero_boton_whatsapp text not null default 'Escribinos por WhatsApp';
+alter table public.branding add column if not exists servicios_titulo text not null default 'Servicios y productos';
+alter table public.branding add column if not exists servicios_descripcion text not null default 'Precios de referencia. Confirmá disponibilidad al escribirnos.';
+
 insert into public.branding (id, logo_url, banner_url)
 values (true, '', '')
 on conflict (id) do nothing;
