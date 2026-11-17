@@ -1,0 +1,134 @@
+# Capacitación: cómo usar la web
+
+Esta guía explica el uso diario. La web tiene dos partes: el **catálogo público** (lo ve cualquiera) y el **panel de administración** (solo vos).
+
+---
+
+## 1. Catálogo público
+
+URL: `https://waltermolares68-lan.github.io/walter-molares/`
+
+- En la parte superior verás el nombre **Servicio Tecnico Walter Molares** y un botón para escribir por WhatsApp.
+- En **Servicios y productos** podés:
+  - buscar por nombre, descripción o código;
+  - filtrar por categoría (Reparación, Repuesto, Accesorio, Otro);
+  - ver el precio de cada servicio.
+- Al tocar **«Consultar por WhatsApp»** se abre WhatsApp con un mensaje listo, por ejemplo:
+
+  > Hola! Quisiera consultar por *Reparación de pantalla (demo)* (SRV-001). Precio: $85.000,00. ¿Podrían ayudarme?
+
+  El cliente y vos ven el mismo código y precio, así no hay confusiones.
+
+---
+
+## 2. Ingresar como administrador
+
+1. Tocá **«Administrador»** arriba a la derecha (o entrá a `/#/login`).
+2. Cargá el email y la contraseña que creaste en Supabase.
+3. Si los datos son correctos, entrás al **Panel**.
+
+Para salir, tocá **«Salir»** en el menú superior.
+
+---
+
+## 3. Panel de administración
+
+El panel muestra cuatro números: compras registradas, en curso, listas para entregar y clientes. Debajo están las últimas compras, cada una con su botón de WhatsApp.
+
+Menú superior:
+
+| Sección | Para qué sirve |
+|---|---|
+| **Panel** | Resumen general |
+| **Servicios** | Catálogo (CRUD) |
+| **Clientes** | Registro de clientes (CRUD) |
+| **Compras** | Ventas y reparaciones (CRUD) |
+
+---
+
+## 4. Servicios (catálogo)
+
+En **Servicios** podés crear, editar, ocultar y eliminar.
+
+**Campos:**
+- **Código**: aparece en el mensaje de WhatsApp. Ejemplo: `SRV-005`.
+- **Categoría**: Reparación / Repuesto / Accesorio / Otro.
+- **Nombre** y **Descripción**: lo que ve el cliente.
+- **Precio**: se muestra con el formato `ARS` (ej. `$85.000,00`).
+- **Visible en el catálogo**: si lo desactivás (`No`), el cliente deja de verlo, pero se conserva para las compras anteriores.
+- **URL de la imagen**: pegá un enlace de una foto de stock con licencia libre (Unsplash/Pexels). Si el enlace falla, se muestra un placeholder.
+
+**Buenas prácticas:**
+- Usá códigos cortos y únicos (`SRV-001`, `ACC-003`).
+- Si un servicio ya tiene compras, **desactivalo** en lugar de eliminarlo.
+- Revisá el botón «WhatsApp» de la fila para confirmar cómo queda el mensaje.
+
+---
+
+## 5. Clientes
+
+En **Clientes** podés dar de alta, editar y eliminar.
+
+- **Nombre**: obligatorio.
+- **Teléfono**: con código de país y solo dígitos, ej. `5491135834902`.
+- **Dirección** y **Notas**: información interna (no se muestra en el catálogo).
+- El icono verde de WhatsApp escribe directamente a ese cliente.
+- No se puede eliminar un cliente que tenga compras asociadas.
+
+---
+
+## 6. Compras y reparaciones
+
+En **Compras** registrás cada venta o trabajo.
+
+### Crear una compra
+
+1. Tocá **«Nueva compra»**.
+2. Elegí el **cliente** y el **servicio/producto**. El precio se completa automáticamente, pero podés cambiarlo (útil si hiciste un descuento).
+3. Elegí el **estado** inicial (normalmente `Recibido`).
+4. Agregá notas internas si querés.
+5. Tocá **«Guardar compra»**.
+
+Al guardar aparece un cartel verde con el número de orden (por ejemplo `ORD-0004`) y el botón **«Enviar por WhatsApp»**. Ese mensaje incluye:
+
+- el código de la compra (`ORD-0004`);
+- el nombre y código del producto (`SRV-001`);
+- el precio;
+- el estado actual.
+
+También podés usar el botón **«WhatsApp»** de cualquier fila, incluso días después.
+
+### Estados
+
+`Recibido` → `Diagnóstico` → `En reparación` → `Listo` → `Entregado`.
+También existe `Cancelado` para trabajos que no se hicieron.
+
+Para cambiar el estado, tocá el lápiz de la fila, elegí el nuevo estado y guardá.
+
+### Filtrar
+
+Usá **«Filtrar por estado»** para ver, por ejemplo, solo lo que está `Listo` para entregar.
+
+---
+
+## 7. Problemas frecuentes
+
+| Situación | Solución |
+|---|---|
+| El catálogo muestra datos "demo" | Falta configurar Supabase o las tablas. Revisá `GUIA_SUPABASE.md`. |
+| No puedo ingresar | El usuario se crea en Supabase → Authentication → Users. No funciona el usuario de ejemplo cuando Supabase está configurado. |
+| El botón de WhatsApp abre un número equivocado | Cambiá el Secret `VITE_WHATSAPP_NUMBER` y volvé a publicar. |
+| Una imagen no carga | Reemplazá la URL por otra de Unsplash/Pexels. |
+| Los precios salen con otro símbolo | Revisá los Secrets `VITE_CURRENCY` y `VITE_LOCALE`. |
+
+---
+
+## 8. Cómo se actualiza la web
+
+Los cambios se publican solos cuando se suben a `main`:
+
+1. Editás el código (o pedís un cambio).
+2. Se hace merge a `main`.
+3. GitHub Actions compila y publica en `https://waltermolares68-lan.github.io/walter-molares/`.
+
+Los datos (productos, clientes, compras) **no están en el código**: están en Supabase, así que podés modificarlos desde el panel sin volver a publicar.
