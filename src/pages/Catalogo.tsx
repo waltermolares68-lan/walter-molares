@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Smartphone } from 'lucide-react'
+import { Pencil, Search, Smartphone } from 'lucide-react'
 import { Contacto } from '../components/Contacto'
 import { ProductCard } from '../components/ProductCard'
 import { EmptyState, ErrorAlert, Spinner, WhatsAppLink } from '../components/ui'
@@ -70,13 +70,22 @@ export default function Catalogo() {
             </div>
           </div>
           <div className="hidden justify-center md:flex">
-            <div className="relative w-full max-w-sm">
+            <div className="group relative w-full max-w-sm">
               <div className="absolute inset-0 rotate-6 rounded-3xl bg-white/10" />
               <img
                 src={bannerUrl || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80'}
                 alt="Imagen de presentación del taller"
-                className="relative max-h-80 rounded-3xl object-cover shadow-2xl"
+                className="relative max-h-80 w-full rounded-3xl object-cover shadow-2xl"
               />
+              {isAdmin && (
+                <Link
+                  to="/admin/marca"
+                  className="absolute bottom-3 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-brand-700 shadow-lg transition hover:bg-white"
+                  title="Cambiar la imagen de presentación desde el panel"
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Cambiar imagen
+                </Link>
+              )}
             </div>
           </div>
         </div>

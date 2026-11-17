@@ -117,14 +117,16 @@ export default function Branding() {
             </span>
           ))}
         </div>
-        <div className="h-40 bg-brand-700">
-          {banner ? (
-            <img src={banner} alt="Presentación" className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-brand-100">
-              Imagen de presentación (pendiente de cargar)
-            </div>
-          )}
+        <div className="bg-brand-700 p-3">
+          <div className="relative mx-auto h-44 max-w-md overflow-hidden rounded-2xl bg-brand-600">
+            {banner ? (
+              <img src={banner} alt="Presentación" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full items-center justify-center px-4 text-center text-sm text-brand-100">
+                Acá se ve la foto del teléfono que aparece arriba del catálogo (pendiente de cargar)
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -147,11 +149,11 @@ export default function Branding() {
             previewClass="h-24 w-24 rounded-full object-cover"
           />
           <ImageUpload
-            label="Imagen horizontal de presentación"
+            label="Imagen de presentación (la foto del teléfono que aparece arriba del catálogo)"
             value={banner}
             onChange={setBanner}
             folder="marca"
-            hint="Recomendado: imagen ancha (por ejemplo 1200 x 400 px). Se muestra en el encabezado del catálogo."
+            hint="Esta es la foto grande del encabezado: la que ahora muestra un iPhone de ejemplo. Subí la tuya y reemplaza esa imagen. Si es ancha (por ejemplo 1200 x 400 px), se ve mejor."
             previewClass="h-40 w-full object-cover"
           />
         </section>

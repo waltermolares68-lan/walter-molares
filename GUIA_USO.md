@@ -117,7 +117,7 @@ Usá **«Filtrar por estado»** para ver, por ejemplo, solo lo que está `Listo`
 En el menú **Marca** podés personalizar el sitio **sin volver a publicar**:
 
 - **Logo de tu marca**: subí una imagen cuadrada. Se muestra **redonda, como una foto de perfil y sin borde**, al lado del nombre del taller.
-- **Imagen horizontal de presentación**: subí una imagen ancha (por ejemplo 1200 x 400 px). Reemplaza la foto del encabezado del catálogo.
+- **Imagen de presentación (la foto del teléfono que aparece arriba del catálogo)**: acá se cambia la foto grande del encabezado, la que viene con un iPhone de ejemplo. Subí la tuya y la reemplaza. Si es ancha (por ejemplo 1200 x 400 px), se ve mejor. También podés tocar **«Cambiar imagen»** directamente sobre la foto del catálogo (solo visible cuando estás logueado): te lleva a este panel.
 - **WhatsApp**: cargá tu número **solo con números y código de país** (ejemplo `5491135834902`, sin el `+`). Todos los botones «Consultar por WhatsApp» del catálogo y del panel usan este número. El botón **«Probar número»** abre WhatsApp para que verifiques que es correcto.
 - **Redes sociales**: Instagram, Facebook, TikTok y YouTube. Pegá el enlace completo o solo tu usuario (ejemplo `@tuusuario`). Las que dejes vacías no se muestran. Aparecen en la sección **Contacto y redes** del catálogo y como iconos en el pie del sitio.
 - **Ubicación y horario**: dirección, enlace de Google Maps (o la dirección directamente) y horario de atención. Se muestra en la sección **Ubicación** del catálogo, con un enlace **«Cómo llegar»**.
