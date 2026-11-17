@@ -56,7 +56,7 @@ En **Servicios** podés crear, editar, ocultar y eliminar.
 - **Nombre** y **Descripción**: lo que ve el cliente.
 - **Precio**: se muestra con el formato `ARS` (ej. `$85.000,00`).
 - **Visible en el catálogo**: si lo desactivás (`No`), el cliente deja de verlo, pero se conserva para las compras anteriores.
-- **URL de la imagen**: pegá un enlace de una foto de stock con licencia libre (Unsplash/Pexels). Si el enlace falla, se muestra un placeholder.
+- **Imagen del servicio**: tocá **«Elegir imagen»** para subir tu propia foto desde la computadora, o pegá una URL de stock con licencia libre (Unsplash/Pexels). También podés **Quitar** la imagen. Si el enlace falla, se muestra un placeholder.
 
 **Buenas prácticas:**
 - Usá códigos cortos y únicos (`SRV-001`, `ACC-003`).
@@ -111,7 +111,20 @@ Usá **«Filtrar por estado»** para ver, por ejemplo, solo lo que está `Listo`
 
 ---
 
-## 7. Problemas frecuentes
+## 7. Marca y presentación
+
+En el menú **Marca** podés personalizar la imagen del sitio **sin volver a publicar**:
+
+- **Logo de tu marca**: subí una imagen cuadrada (mejor si es PNG con fondo transparente). Reemplaza el icono que aparece al lado del nombre del taller en el menú.
+- **Imagen horizontal de presentación**: subí una imagen ancha (por ejemplo 1200 x 400 px). Reemplaza la foto del encabezado del catálogo.
+
+Tocá **«Guardar marca»** y los cambios se ven enseguida en todo el sitio. Abajo del formulario hay una vista previa antes de guardar.
+
+> Si todavía no aparece el menú **Marca**, ejecutá de nuevo `supabase/schema.sql` en Supabase (ver `GUIA_SUPABASE.md`, paso 1).
+
+---
+
+## 8. Problemas frecuentes
 
 | Situación | Solución |
 |---|---|
@@ -120,10 +133,12 @@ Usá **«Filtrar por estado»** para ver, por ejemplo, solo lo que está `Listo`
 | El botón de WhatsApp abre un número equivocado | Cambiá el Secret `VITE_WHATSAPP_NUMBER` y volvé a publicar. |
 | Una imagen no carga | Reemplazá la URL por otra de Unsplash/Pexels. |
 | Los precios salen con otro símbolo | Revisá los Secrets `VITE_CURRENCY` y `VITE_LOCALE`. |
+| Al tocar «Ver servicios» sale 404 | Recargá la página con `Ctrl+F5`; el enlace ya está corregido en la última versión. |
+| No aparece el menú «Marca» o no puedo subir imágenes | Ejecutá de nuevo `supabase/schema.sql` y revisá que exista el bucket `imagenes`. |
 
 ---
 
-## 8. Cómo se actualiza la web
+## 9. Cómo se actualiza la web
 
 Los cambios se publican solos cuando se suben a `main`:
 

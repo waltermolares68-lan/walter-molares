@@ -2,6 +2,8 @@ import { HashRouter, Link, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import { BrandingProvider } from './context/BrandingContext'
+import Branding from './pages/Branding'
 import Catalogo from './pages/Catalogo'
 import Clientes from './pages/Clientes'
 import Dashboard from './pages/Dashboard'
@@ -24,45 +26,55 @@ export default function App() {
   return (
     <HashRouter>
       <AuthProvider>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Catalogo />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/productos"
-              element={
-                <ProtectedRoute>
-                  <Productos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/clientes"
-              element={
-                <ProtectedRoute>
-                  <Clientes />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/ordenes"
-              element={
-                <ProtectedRoute>
-                  <Ordenes />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <BrandingProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Catalogo />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/productos"
+                element={
+                  <ProtectedRoute>
+                    <Productos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/clientes"
+                element={
+                  <ProtectedRoute>
+                    <Clientes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/ordenes"
+                element={
+                  <ProtectedRoute>
+                    <Ordenes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/marca"
+                element={
+                  <ProtectedRoute>
+                    <Branding />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </BrandingProvider>
       </AuthProvider>
     </HashRouter>
   )

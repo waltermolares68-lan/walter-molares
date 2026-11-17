@@ -4,12 +4,14 @@ import { Search, Smartphone } from 'lucide-react'
 import { ProductCard } from '../components/ProductCard'
 import { EmptyState, ErrorAlert, Spinner, WhatsAppLink } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
+import { useBranding } from '../context/BrandingContext'
 import { getProductos } from '../lib/data'
 import { whatsappGeneral } from '../lib/whatsapp'
 import { CATEGORIAS, type Categoria, type Producto } from '../types'
 
 export default function Catalogo() {
   const { isAdmin } = useAuth()
+  const { bannerUrl } = useBranding()
   const [productos, setProductos] = useState<Producto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -49,9 +51,15 @@ export default function Catalogo() {
               sepas exactamente de qué se trata.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#servicios" className="btn-ghost border-0 bg-white text-brand-700 hover:bg-brand-50">
+              <button
+                type="button"
+                onClick={() =>
+                  document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })
+                }
+                className="btn-ghost border-0 bg-white text-brand-700 hover:bg-brand-50"
+              >
                 Ver servicios
-              </a>
+              </button>
               <WhatsAppLink
                 href={whatsappGeneral()}
                 label="Escribinos por WhatsApp"
@@ -63,9 +71,9 @@ export default function Catalogo() {
             <div className="relative w-full max-w-sm">
               <div className="absolute inset-0 rotate-6 rounded-3xl bg-white/10" />
               <img
-                src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
-                alt="Teléfono móvil sobre fondo claro"
-                className="relative rounded-3xl object-cover shadow-2xl"
+                src={bannerUrl || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80'}
+                alt="Imagen de presentación del taller"
+                className="relative max-h-80 rounded-3xl object-cover shadow-2xl"
               />
             </div>
           </div>

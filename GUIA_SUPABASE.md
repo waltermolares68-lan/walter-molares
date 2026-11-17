@@ -10,7 +10,12 @@ Seguí estos pasos una sola vez. Después, el sistema queda funcionando en la we
 2. En el menú lateral: **SQL Editor** → **New query**.
 3. Copiá TODO el contenido de `supabase/schema.sql` de este repositorio y pegalo en el editor.
 4. Presioná **Run**. Debe aparecer `Success. No rows returned` y luego los datos de ejemplo.
-5. Verificá en **Table Editor** que existan las tablas `productos`, `clientes` y `ordenes`.
+5. Verificá en **Table Editor** que existan las tablas `productos`, `clientes`, `ordenes` y `branding`.
+6. Verificá en **Storage** que exista el bucket público `imagenes`.
+
+> Si ya habías ejecutado el script antes, **volvé a ejecutarlo completo**: es seguro, no borra datos
+> y solo agrega la tabla `branding`, el bucket `imagenes` y sus permisos. Necesario para subir
+> imágenes y cambiar el logo/banner desde el panel.
 
 > El script crea tres servicios de prueba genéricos (`SRV-001`, `SRV-002`, `ACC-003`). Podés borrarlos o editarlos desde el panel admin.
 

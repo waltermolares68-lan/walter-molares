@@ -9,6 +9,8 @@ Sistema web de gestión para un taller de reparación de teléfonos: catálogo p
 - **CRUD completo** de tres entidades: `productos`, `clientes` y `ordenes` (compras/reparaciones).
 - **WhatsApp por compra**: al crear una compra aparece un botón que envía el código de orden, el producto y el precio. También hay un botón en cada fila.
 - **Estados de reparación**: Recibido → Diagnóstico → En reparación → Listo → Entregado / Cancelado.
+- **Subida de imágenes** a Supabase Storage desde el panel (productos, logo y banner). En modo demo se guardan como datos locales.
+- **Personalización de marca**: logo y banner horizontal editables desde **Panel → Marca**, sin volver a publicar.
 - **Supabase** para autenticación y base de datos con Row Level Security (RLS). Si no hay credenciales, la app entra en **modo demostración** con `localStorage`.
 - **GitHub Pages** mediante GitHub Actions.
 

@@ -1,12 +1,15 @@
 import { supabase } from './supabase'
 import { demoClientes, demoOrdenes, demoProductos } from './demoData'
-import type { Cliente, Orden, OrdenConDetalle, Producto } from '../types'
+import type { Branding, Cliente, Orden, OrdenConDetalle, Producto } from '../types'
 
 const KEY = {
   productos: 'stwm.productos.v1',
   clientes: 'stwm.clientes.v1',
   ordenes: 'stwm.ordenes.v1',
+  branding: 'stwm.branding.v1',
 }
+
+const STORAGE_BUCKET = 'imagenes'
 
 function readLocal<T>(key: string, seed: T[]): T[] {
   try {
@@ -244,4 +247,71 @@ export async function deleteOrden(id: string): Promise<void> {
     KEY.ordenes,
     readLocal<Orden>(KEY.ordenes, demoOrdenes).filter((o) => o.id !== id),
   )
+}
+
+// ------------------------------ Marca / branding -----------------------------
+
+const defaultBranding: Branding = { id: true, logo_url: '', banner_url: '' }
+
+export async function getBranding(): Promise<Branding> {
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('branding')
+      .select('*')
+      .eq('id', true)
+      .maybeSingle()
+    if (error) throw error
+    return (data as Branding | null) ?? defaultBranding
+  }
+
+  try {
+    const raw = localStorage.getItem(KEY.branding)
+    return raw ? { ...defaultBranding, ...(JSON.parse(raw) as Partial<Branding>) } : defaultBranding
+  } catch {
+    return defaultBranding
+  }
+}
+
+export async function saveBranding(
+  input: Pick<Branding, 'logo_url' | 'banner_url'>,
+): Promise<void> {
+  const now = new Date().toISOString()
+  if (supabase) {
+    const { error } = await supabase
+      .from('branding')
+      .upsert({ id: true, ...input, updated_at: now })
+    if (error) throw error
+    return
+  }
+  localStorage.setItem(KEY.branding, JSON.stringify({ id: true, ...input, updated_at: now }))
+}
+
+/** Sube una imagen a Supabase Storage. En modo demo devuelve un data URL local. */
+export async function uploadImage(
+  file: File,
+  folder: 'productos' | 'marca',
+): Promise<string> {
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('La imagen debe pesar menos de 5 MB.')
+  }
+
+  if (supabase) {
+    const extension = file.name.includes('.') ? file.name.split('.').pop() : 'jpg'
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`
+    const { error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(path, file, { contentType: file.type, upsert: false })
+    if (error) throw error
+    return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl
+  }
+
+  if (file.size > 1.5 * 1024 * 1024) {
+    throw new Error('En modo demo la imagen debe pesar menos de 1,5 MB.')
+  }
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error('No se pudo leer la imagen.'))
+    reader.readAsDataURL(file)
+  })
 }

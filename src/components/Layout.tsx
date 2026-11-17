@@ -7,11 +7,13 @@ import {
   LogIn,
   LogOut,
   Menu,
+  Palette,
   Users,
   Wrench,
   X,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useBranding } from '../context/BrandingContext'
 import { whatsappNumber } from '../lib/whatsapp'
 
 const adminLinks = [
@@ -19,10 +21,12 @@ const adminLinks = [
   { to: '/admin/productos', label: 'Servicios', icon: Wrench, end: false },
   { to: '/admin/clientes', label: 'Clientes', icon: Users, end: false },
   { to: '/admin/ordenes', label: 'Compras', icon: ClipboardList, end: false },
+  { to: '/admin/marca', label: 'Marca', icon: Palette, end: false },
 ]
 
 export function Layout({ children }: { children: ReactNode }) {
   const { isAdmin, isDemo, signOut, user } = useAuth()
+  const { logoUrl } = useBranding()
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -49,8 +53,12 @@ export function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <Link to="/" className="flex items-center gap-2.5" onClick={() => setMenuOpen(false)}>
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <Wrench className="h-5 w-5" />
+            <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-brand-600 text-white">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
+              ) : (
+                <Wrench className="h-5 w-5" />
+              )}
             </span>
             <span className="leading-tight">
               <span className="block text-sm font-bold text-slate-900 sm:text-base">

@@ -56,3 +56,10 @@ export interface OrdenConDetalle extends Orden {
   cliente?: Cliente
   producto?: Producto
 }
+
+export interface Branding {
+  id: boolean
+  logo_url: string
+  banner_url: string
+  updated_at?: string
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { ImageUpload } from '../components/ImageUpload'
 import {
   ConfirmDialog,
   EmptyState,
@@ -256,9 +257,13 @@ export default function Productos() {
               </select>
             </Field>
           </div>
-          <Field label="URL de la imagen" hint="Usá imágenes de stock con licencia libre para uso comercial. Si falla, se muestra un placeholder.">
-            <input type="url" className="input" value={form.imagen_url} onChange={(e) => updateField('imagen_url', e.target.value)} placeholder="https://images.unsplash.com/…" />
-          </Field>
+          <ImageUpload
+            label="Imagen del servicio"
+            value={form.imagen_url}
+            onChange={(url) => updateField('imagen_url', url)}
+            folder="productos"
+            hint="Subí tu propia imagen o pegá una URL de stock con licencia libre. Si falla, se muestra un placeholder."
+          />
           {error && modalOpen && <ErrorAlert message={error} />}
         </form>
       </Modal>

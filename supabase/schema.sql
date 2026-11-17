@@ -85,3 +85,56 @@ values
   ('ACC-003', 'Funda protectora (demo)', 'Accesorio', 'Producto de ejemplo: funda universal.', 12000,
    'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=800&q=80', true)
 on conflict (codigo) do nothing;
+
+-- ==================== Marca y almacenamiento de imágenes ====================
+
+create table if not exists public.branding (
+  id boolean primary key default true check (id),
+  logo_url text not null default '',
+  banner_url text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+insert into public.branding (id, logo_url, banner_url)
+values (true, '', '')
+on conflict (id) do nothing;
+
+alter table public.branding enable row level security;
+
+-- El logo y el banner son públicos (los ve cualquiera); solo el admin los edita.
+drop policy if exists "branding_select_publico" on public.branding;
+create policy "branding_select_publico"
+  on public.branding for select
+  using (true);
+
+drop policy if exists "branding_admin_all" on public.branding;
+create policy "branding_admin_all"
+  on public.branding for all
+  using ((select auth.role()) = 'authenticated')
+  with check ((select auth.role()) = 'authenticated');
+
+-- Bucket público para las imágenes subidas desde el panel.
+insert into storage.buckets (id, name, public)
+values ('imagenes', 'imagenes', true)
+on conflict (id) do nothing;
+
+drop policy if exists "imagenes_public_select" on storage.objects;
+create policy "imagenes_public_select"
+  on storage.objects for select
+  using (bucket_id = 'imagenes');
+
+drop policy if exists "imagenes_admin_insert" on storage.objects;
+create policy "imagenes_admin_insert"
+  on storage.objects for insert
+  with check (bucket_id = 'imagenes' and (select auth.role()) = 'authenticated');
+
+drop policy if exists "imagenes_admin_update" on storage.objects;
+create policy "imagenes_admin_update"
+  on storage.objects for update
+  using (bucket_id = 'imagenes' and (select auth.role()) = 'authenticated')
+  with check (bucket_id = 'imagenes' and (select auth.role()) = 'authenticated');
+
+drop policy if exists "imagenes_admin_delete" on storage.objects;
+create policy "imagenes_admin_delete"
+  on storage.objects for delete
+  using (bucket_id = 'imagenes' and (select auth.role()) = 'authenticated');
