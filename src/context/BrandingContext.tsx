@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { getBranding } from '../lib/data'
+import { defaultBranding, getBranding } from '../lib/data'
 import type { Branding } from '../types'
 
 interface BrandingContextValue {
@@ -15,7 +15,6 @@ interface BrandingContextValue {
   refresh: () => Promise<void>
 }
 
-const defaultBranding: Branding = { id: true, logo_url: '', banner_url: '' }
 const BrandingContext = createContext<BrandingContextValue | undefined>(undefined)
 
 export function BrandingProvider({ children }: { children: ReactNode }) {

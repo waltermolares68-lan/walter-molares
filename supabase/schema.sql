@@ -95,6 +95,16 @@ create table if not exists public.branding (
   updated_at timestamptz not null default now()
 );
 
+-- Columnas del panel (seguro si la tabla ya existía): WhatsApp, redes y ubicación.
+alter table public.branding add column if not exists whatsapp text not null default '5491135834902';
+alter table public.branding add column if not exists instagram text not null default '';
+alter table public.branding add column if not exists facebook text not null default '';
+alter table public.branding add column if not exists tiktok text not null default '';
+alter table public.branding add column if not exists youtube text not null default '';
+alter table public.branding add column if not exists direccion text not null default '';
+alter table public.branding add column if not exists mapa_url text not null default '';
+alter table public.branding add column if not exists horario text not null default '';
+
 insert into public.branding (id, logo_url, banner_url)
 values (true, '', '')
 on conflict (id) do nothing;

@@ -4,7 +4,7 @@ import { CheckCircle2, ClipboardList, Package, Users } from 'lucide-react'
 import { ErrorAlert, EstadoBadge, Spinner, WhatsAppLink } from '../components/ui'
 import { getClientes, getOrdenes, getProductos } from '../lib/data'
 import { formatDate, formatPrice } from '../lib/format'
-import { whatsappOrden } from '../lib/whatsapp'
+import { useWhatsapp } from '../hooks/useWhatsapp'
 import type { Cliente, OrdenConDetalle, Producto } from '../types'
 
 export default function Dashboard() {
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [productos, setProductos] = useState<Producto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const wa = useWhatsapp()
 
   useEffect(() => {
     Promise.all([getOrdenes(), getClientes(), getProductos()])
@@ -98,7 +99,7 @@ export default function Dashboard() {
                     <td className="px-5 py-3"><EstadoBadge estado={orden.estado} /></td>
                     <td className="px-5 py-3">
                       <WhatsAppLink
-                        href={whatsappOrden(orden)}
+                        href={wa.orden(orden)}
                         label="Abrir"
                         className="btn-whatsapp px-3 py-1.5 text-xs"
                       />

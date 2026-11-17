@@ -61,5 +61,27 @@ export interface Branding {
   id: boolean
   logo_url: string
   banner_url: string
+  whatsapp: string
+  instagram: string
+  facebook: string
+  tiktok: string
+  youtube: string
+  direccion: string
+  mapa_url: string
+  horario: string
   updated_at?: string
 }
+
+export type BrandingInput = Pick<
+  Branding,
+  | 'logo_url'
+  | 'banner_url'
+  | 'whatsapp'
+  | 'instagram'
+  | 'facebook'
+  | 'tiktok'
+  | 'youtube'
+  | 'direccion'
+  | 'mapa_url'
+  | 'horario'
+>

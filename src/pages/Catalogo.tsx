@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Smartphone } from 'lucide-react'
+import { Contacto } from '../components/Contacto'
 import { ProductCard } from '../components/ProductCard'
 import { EmptyState, ErrorAlert, Spinner, WhatsAppLink } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 import { useBranding } from '../context/BrandingContext'
+import { useWhatsapp } from '../hooks/useWhatsapp'
 import { getProductos } from '../lib/data'
-import { whatsappGeneral } from '../lib/whatsapp'
 import { CATEGORIAS, type Categoria, type Producto } from '../types'
 
 export default function Catalogo() {
   const { isAdmin } = useAuth()
   const { bannerUrl } = useBranding()
+  const wa = useWhatsapp()
   const [productos, setProductos] = useState<Producto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -61,7 +63,7 @@ export default function Catalogo() {
                 Ver servicios
               </button>
               <WhatsAppLink
-                href={whatsappGeneral()}
+                href={wa.general()}
                 label="Escribinos por WhatsApp"
                 className="btn-whatsapp"
               />
@@ -137,6 +139,8 @@ export default function Catalogo() {
           </div>
         )}
       </section>
+
+      <Contacto />
     </>
   )
 }

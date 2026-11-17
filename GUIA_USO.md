@@ -43,6 +43,7 @@ Menú superior:
 | **Servicios** | Catálogo (CRUD) |
 | **Clientes** | Registro de clientes (CRUD) |
 | **Compras** | Ventas y reparaciones (CRUD) |
+| **Marca** | Logo, WhatsApp, redes y ubicación |
 
 ---
 
@@ -111,16 +112,21 @@ Usá **«Filtrar por estado»** para ver, por ejemplo, solo lo que está `Listo`
 
 ---
 
-## 7. Marca y presentación
+## 7. Marca, WhatsApp, redes y ubicación
 
-En el menú **Marca** podés personalizar la imagen del sitio **sin volver a publicar**:
+En el menú **Marca** podés personalizar el sitio **sin volver a publicar**:
 
-- **Logo de tu marca**: subí una imagen cuadrada (mejor si es PNG con fondo transparente). Reemplaza el icono que aparece al lado del nombre del taller en el menú.
+- **Logo de tu marca**: subí una imagen cuadrada. Se muestra **redonda, como una foto de perfil y sin borde**, al lado del nombre del taller.
 - **Imagen horizontal de presentación**: subí una imagen ancha (por ejemplo 1200 x 400 px). Reemplaza la foto del encabezado del catálogo.
+- **WhatsApp**: cargá tu número **solo con números y código de país** (ejemplo `5491135834902`, sin el `+`). Todos los botones «Consultar por WhatsApp» del catálogo y del panel usan este número. El botón **«Probar número»** abre WhatsApp para que verifiques que es correcto.
+- **Redes sociales**: Instagram, Facebook, TikTok y YouTube. Pegá el enlace completo o solo tu usuario (ejemplo `@tuusuario`). Las que dejes vacías no se muestran. Aparecen en la sección **Contacto y redes** del catálogo y como iconos en el pie del sitio.
+- **Ubicación y horario**: dirección, enlace de Google Maps (o la dirección directamente) y horario de atención. Se muestra en la sección **Ubicación** del catálogo, con un enlace **«Cómo llegar»**.
 
-Tocá **«Guardar marca»** y los cambios se ven enseguida en todo el sitio. Abajo del formulario hay una vista previa antes de guardar.
+Tocá **«Guardar cambios»** y todo se ve enseguida en el sitio. Arriba del formulario hay una **vista previa** con el logo redondo, el número y los iconos de las redes cargadas.
 
-> Si todavía no aparece el menú **Marca**, ejecutá de nuevo `supabase/schema.sql` en Supabase (ver `GUIA_SUPABASE.md`, paso 1).
+> Si cambiás de teléfono, entrá acá, actualizá el número y guardá: no hace falta volver a publicar la web.
+
+> Si todavía no aparece el menú **Marca** o no podés guardar estos campos, ejecutá de nuevo `supabase/schema.sql` en Supabase (ver `GUIA_SUPABASE.md`, paso 1).
 
 ---
 
@@ -130,7 +136,7 @@ Tocá **«Guardar marca»** y los cambios se ven enseguida en todo el sitio. Aba
 |---|---|
 | El catálogo muestra datos "demo" | Falta configurar Supabase o las tablas. Revisá `GUIA_SUPABASE.md`. |
 | No puedo ingresar | El usuario se crea en Supabase → Authentication → Users. No funciona el usuario de ejemplo cuando Supabase está configurado. |
-| El botón de WhatsApp abre un número equivocado | Cambiá el Secret `VITE_WHATSAPP_NUMBER` y volvé a publicar. |
+| El botón de WhatsApp abre un número equivocado | Entrá a **Marca**, corregí el número y guardá. Solo si aún no cargaste el esquema nuevo, actualizá el Secret `VITE_WHATSAPP_NUMBER` y volvé a publicar. |
 | Una imagen no carga | Reemplazá la URL por otra de Unsplash/Pexels. |
 | Los precios salen con otro símbolo | Revisá los Secrets `VITE_CURRENCY` y `VITE_LOCALE`. |
 | Al tocar «Ver servicios» sale 404 | Recargá la página con `Ctrl+F5`; el enlace ya está corregido en la última versión. |
@@ -146,4 +152,4 @@ Los cambios se publican solos cuando se suben a `main`:
 2. Se hace merge a `main`.
 3. GitHub Actions compila y publica en `https://waltermolares68-lan.github.io/walter-molares/`.
 
-Los datos (productos, clientes, compras) **no están en el código**: están en Supabase, así que podés modificarlos desde el panel sin volver a publicar.
+Los datos (productos, clientes, compras, WhatsApp, redes, ubicación, logo y banner) **no están en el código**: están en Supabase, así que podés modificarlos desde el panel sin volver a publicar.

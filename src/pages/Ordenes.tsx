@@ -20,7 +20,7 @@ import {
   type OrdenInput,
 } from '../lib/data'
 import { formatDate, formatPrice } from '../lib/format'
-import { whatsappOrden } from '../lib/whatsapp'
+import { useWhatsapp } from '../hooks/useWhatsapp'
 import {
   ESTADOS,
   type Cliente,
@@ -53,6 +53,7 @@ export default function Ordenes() {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [successOrder, setSuccessOrder] = useState<OrdenConDetalle | null>(null)
+  const wa = useWhatsapp()
 
   function cargar() {
     setLoading(true)
@@ -190,7 +191,7 @@ export default function Ordenes() {
               </div>
             </div>
             <div className="flex gap-2">
-              <WhatsAppLink href={whatsappOrden(successOrder)} label="Enviar por WhatsApp" />
+              <WhatsAppLink href={wa.orden(successOrder)} label="Enviar por WhatsApp" />
               <button type="button" className="btn-ghost" onClick={() => setSuccessOrder(null)}>Cerrar</button>
             </div>
           </div>
@@ -243,7 +244,7 @@ export default function Ordenes() {
                     <td className="px-4 py-3"><EstadoBadge estado={orden.estado} /></td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
-                        <WhatsAppLink href={whatsappOrden(orden)} label="WhatsApp" className="btn-whatsapp px-2.5 py-1.5 text-xs" />
+                        <WhatsAppLink href={wa.orden(orden)} label="WhatsApp" className="btn-whatsapp px-2.5 py-1.5 text-xs" />
                         <button type="button" onClick={() => openEdit(orden)} className="btn-ghost px-2.5 py-1.5 text-xs" title="Editar">
                           <Pencil className="h-3.5 w-3.5" />
                         </button>

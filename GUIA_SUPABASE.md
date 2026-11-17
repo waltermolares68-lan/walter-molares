@@ -11,11 +11,12 @@ Seguí estos pasos una sola vez. Después, el sistema queda funcionando en la we
 3. Copiá TODO el contenido de `supabase/schema.sql` de este repositorio y pegalo en el editor.
 4. Presioná **Run**. Debe aparecer `Success. No rows returned` y luego los datos de ejemplo.
 5. Verificá en **Table Editor** que existan las tablas `productos`, `clientes`, `ordenes` y `branding`.
-6. Verificá en **Storage** que exista el bucket público `imagenes`.
+6. Verificá en la tabla `branding` las columnas `logo_url`, `banner_url`, `whatsapp`, `instagram`, `facebook`, `tiktok`, `youtube`, `direccion`, `mapa_url` y `horario`.
+7. Verificá en **Storage** que exista el bucket público `imagenes`.
 
 > Si ya habías ejecutado el script antes, **volvé a ejecutarlo completo**: es seguro, no borra datos
-> y solo agrega la tabla `branding`, el bucket `imagenes` y sus permisos. Necesario para subir
-> imágenes y cambiar el logo/banner desde el panel.
+> y solo agrega la tabla `branding`, sus columnas nuevas, el bucket `imagenes` y sus permisos.
+> Necesario para subir imágenes y para que el panel pueda guardar WhatsApp, redes y ubicación.
 
 > El script crea tres servicios de prueba genéricos (`SRV-001`, `SRV-002`, `ACC-003`). Podés borrarlos o editarlos desde el panel admin.
 
@@ -82,7 +83,8 @@ Cada push a `main` vuelve a publicar automáticamente.
 
 ## Cambios frecuentes
 
-- **Cambiar el número de WhatsApp**: editá el Secret `VITE_WHATSAPP_NUMBER` y hacé un push a `main` (o `workflow_dispatch` en Actions) para recomilar.
-- **Cambiar moneda**: editá `VITE_CURRENCY` y `VITE_LOCALE`.
+- **Cambiar el número de WhatsApp**: entrá al panel → **Marca**, editá el número y guardá. No hace falta tocar Secrets ni volver a publicar. El Secret `VITE_WHATSAPP_NUMBER` queda solo como valor inicial/respaldo.
+- **Cambiar logo, banner, redes o ubicación**: panel → **Marca** → guardar. Se aplica al instante en todo el sitio.
+- **Cambiar moneda**: editá `VITE_CURRENCY` y `VITE_LOCALE` (son del build, requieren volver a publicar).
 - **Cambiar contraseña del admin**: Supabase → Authentication → Users → seleccionar usuario → **Reset password**.
-- **Agregar imágenes**: usá URLs de Unsplash/Pexels con licencia libre para uso comercial y pegalas en el campo «URL de la imagen».
+- **Agregar imágenes**: subilas desde el botón **«Elegir imagen»** del panel (se guardan en Supabase Storage) o pegá URLs de Unsplash/Pexels con licencia libre para uso comercial.

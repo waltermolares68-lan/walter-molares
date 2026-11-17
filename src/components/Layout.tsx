@@ -14,7 +14,8 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useBranding } from '../context/BrandingContext'
-import { whatsappNumber } from '../lib/whatsapp'
+import { useWhatsapp } from '../hooks/useWhatsapp'
+import { useSocialLinks } from './Contacto'
 
 const adminLinks = [
   { to: '/admin', label: 'Panel', icon: LayoutDashboard, end: true },
@@ -27,6 +28,8 @@ const adminLinks = [
 export function Layout({ children }: { children: ReactNode }) {
   const { isAdmin, isDemo, signOut, user } = useAuth()
   const { logoUrl } = useBranding()
+  const wa = useWhatsapp()
+  const redes = useSocialLinks()
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -53,11 +56,13 @@ export function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <Link to="/" className="flex items-center gap-2.5" onClick={() => setMenuOpen(false)}>
-            <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-brand-600 text-white">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full">
               {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
+                <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
               ) : (
-                <Wrench className="h-5 w-5" />
+                <span className="flex h-full w-full items-center justify-center rounded-full bg-brand-600 text-white">
+                  <Wrench className="h-5 w-5" />
+                </span>
               )}
             </span>
             <span className="leading-tight">
@@ -146,9 +151,31 @@ export function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Servicio Tecnico Walter Molares</p>
-          <p>WhatsApp: +{whatsappNumber}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <a
+              href={wa.general()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand-600 hover:underline"
+            >
+              WhatsApp: +{wa.phone}
+            </a>
+            {redes.map(({ label, href, icon: Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={label}
+                aria-label={label}
+                className="text-slate-400 hover:text-brand-600"
+              >
+                <Icon className="h-4 w-4" />
+              </a>
+            ))}
+          </div>
         </div>
       </footer>
     </div>

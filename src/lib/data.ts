@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import { demoClientes, demoOrdenes, demoProductos } from './demoData'
-import type { Branding, Cliente, Orden, OrdenConDetalle, Producto } from '../types'
+import type { Branding, BrandingInput, Cliente, Orden, OrdenConDetalle, Producto } from '../types'
 
 const KEY = {
   productos: 'stwm.productos.v1',
@@ -251,7 +251,19 @@ export async function deleteOrden(id: string): Promise<void> {
 
 // ------------------------------ Marca / branding -----------------------------
 
-const defaultBranding: Branding = { id: true, logo_url: '', banner_url: '' }
+export const defaultBranding: Branding = {
+  id: true,
+  logo_url: '',
+  banner_url: '',
+  whatsapp: '5491135834902',
+  instagram: '',
+  facebook: '',
+  tiktok: '',
+  youtube: '',
+  direccion: '',
+  mapa_url: '',
+  horario: '',
+}
 
 export async function getBranding(): Promise<Branding> {
   if (supabase) {
@@ -261,7 +273,8 @@ export async function getBranding(): Promise<Branding> {
       .eq('id', true)
       .maybeSingle()
     if (error) throw error
-    return (data as Branding | null) ?? defaultBranding
+    // Se mezclan los valores por defecto por si la fila aún no tiene las columnas nuevas.
+    return data ? { ...defaultBranding, ...(data as Partial<Branding>) } : defaultBranding
   }
 
   try {
@@ -272,15 +285,21 @@ export async function getBranding(): Promise<Branding> {
   }
 }
 
-export async function saveBranding(
-  input: Pick<Branding, 'logo_url' | 'banner_url'>,
-): Promise<void> {
+export async function saveBranding(input: BrandingInput): Promise<void> {
   const now = new Date().toISOString()
   if (supabase) {
     const { error } = await supabase
       .from('branding')
       .upsert({ id: true, ...input, updated_at: now })
-    if (error) throw error
+    if (error) {
+      // Si la tabla es de una versión anterior, el error de columnas se traduce a una acción concreta.
+      if (/column|schema cache|pgrst204/i.test(error.message ?? '')) {
+        throw new Error(
+          'Falta actualizar la base de datos: ejecutá supabase/schema.sql en Supabase (SQL Editor) y volvé a intentar.',
+        )
+      }
+      throw error
+    }
     return
   }
   localStorage.setItem(KEY.branding, JSON.stringify({ id: true, ...input, updated_at: now }))

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { ImageOff, Tag } from 'lucide-react'
 import type { Producto } from '../types'
+import { useWhatsapp } from '../hooks/useWhatsapp'
 import { formatPrice } from '../lib/format'
-import { whatsappProducto } from '../lib/whatsapp'
 import { WhatsAppLink } from './ui'
 
 export function ProductCard({ producto }: { producto: Producto }) {
   const [imageError, setImageError] = useState(false)
+  const wa = useWhatsapp()
 
   return (
     <article className="card flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
@@ -42,7 +43,7 @@ export function ProductCard({ producto }: { producto: Producto }) {
           {formatPrice(producto.precio)}
         </p>
         <WhatsAppLink
-          href={whatsappProducto(producto)}
+          href={wa.producto(producto)}
           label="Consultar por WhatsApp"
           className="btn-whatsapp mt-4 w-full"
         />

@@ -12,7 +12,7 @@ import {
 } from '../components/ui'
 import { createProducto, deleteProducto, getProductos, updateProducto, type ProductoInput } from '../lib/data'
 import { formatPrice } from '../lib/format'
-import { whatsappProducto } from '../lib/whatsapp'
+import { useWhatsapp } from '../hooks/useWhatsapp'
 import { CATEGORIAS, type Categoria, type Producto } from '../types'
 
 interface FormState {
@@ -49,6 +49,7 @@ export default function Productos() {
   const [saving, setSaving] = useState(false)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const wa = useWhatsapp()
 
   function cargar() {
     setLoading(true)
@@ -195,7 +196,7 @@ export default function Productos() {
                       <div className="flex items-center gap-1.5">
                         {producto.activo && (
                           <WhatsAppLink
-                            href={whatsappProducto(producto)}
+                            href={wa.producto(producto)}
                             label="WhatsApp"
                             className="btn-whatsapp px-2.5 py-1.5 text-xs"
                           />

@@ -10,7 +10,7 @@ Sistema web de gestión para un taller de reparación de teléfonos: catálogo p
 - **WhatsApp por compra**: al crear una compra aparece un botón que envía el código de orden, el producto y el precio. También hay un botón en cada fila.
 - **Estados de reparación**: Recibido → Diagnóstico → En reparación → Listo → Entregado / Cancelado.
 - **Subida de imágenes** a Supabase Storage desde el panel (productos, logo y banner). En modo demo se guardan como datos locales.
-- **Personalización de marca**: logo y banner horizontal editables desde **Panel → Marca**, sin volver a publicar.
+- **Personalización de marca**: logo redondo (estilo foto de perfil, sin borde), banner horizontal, **número de WhatsApp**, **redes sociales** (Instagram, Facebook, TikTok, YouTube), dirección, mapa y horario editables desde **Panel → Marca**, sin volver a publicar.
 - **Supabase** para autenticación y base de datos con Row Level Security (RLS). Si no hay credenciales, la app entra en **modo demostración** con `localStorage`.
 - **GitHub Pages** mediante GitHub Actions.
 
@@ -23,9 +23,10 @@ React 18 + TypeScript + Vite + Tailwind CSS + React Router (HashRouter) + Supaba
 ```
 src/
   components/   Layout, rutas protegidas, tarjetas y componentes de UI
-  context/      AuthContext (Supabase Auth / demo local)
+  context/      AuthContext (Supabase Auth / demo local), BrandingContext
+  hooks/        useWhatsapp (enlaces con el número editable del panel)
   lib/          supabase, data (CRUD), whatsapp, format, demoData
-  pages/        Catálogo, Login, Dashboard, Productos, Clientes, Ordenes
+  pages/        Catálogo, Login, Dashboard, Productos, Clientes, Ordenes, Marca
 supabase/
   schema.sql    Tablas, RLS y datos de prueba genéricos
 .github/workflows/deploy.yml
