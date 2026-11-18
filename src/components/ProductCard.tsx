@@ -1,13 +1,38 @@
 import { useState } from 'react'
-import { ImageOff, Tag } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Coins, ImageOff, Loader2, Tag } from 'lucide-react'
 import type { Producto } from '../types'
+import { useAuth } from '../context/AuthContext'
 import { useWhatsapp } from '../hooks/useWhatsapp'
+import { pagarConCreditos } from '../lib/data'
 import { formatPrice } from '../lib/format'
 import { WhatsAppLink } from './ui'
 
 export function ProductCard({ producto }: { producto: Producto }) {
   const [imageError, setImageError] = useState(false)
+  const [comprando, setComprando] = useState(false)
+  const [error, setError] = useState('')
+  const [codigoCompra, setCodigoCompra] = useState('')
+  const { isCliente, user } = useAuth()
+  const navigate = useNavigate()
   const wa = useWhatsapp()
+
+  async function handleComprar() {
+    if (!user || producto.creditos <= 0) return
+    setComprando(true)
+    setError('')
+    setCodigoCompra('')
+    try {
+      const orden = await pagarConCreditos(producto, user.id)
+      setCodigoCompra(orden.codigo)
+    } catch (err) {
+      const mensaje = err instanceof Error ? err.message : 'No se pudo completar la compra.'
+      setError(mensaje)
+      if (/saldo insuficiente/i.test(mensaje)) navigate('/mi-cuenta')
+    } finally {
+      setComprando(false)
+    }
+  }
 
   return (
     <article className="card flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
@@ -29,6 +54,11 @@ export function ProductCard({ producto }: { producto: Producto }) {
         <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2 py-1 text-[11px] font-bold text-brand-700 shadow-sm">
           {producto.codigo}
         </span>
+        {producto.creditos > 0 && (
+          <span className="absolute right-3 top-3 rounded-md bg-brand-700 px-2 py-1 text-[11px] font-bold text-white shadow-sm">
+            {producto.creditos} créditos
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -42,10 +72,33 @@ export function ProductCard({ producto }: { producto: Producto }) {
         <p className="mt-3 text-xl font-extrabold text-brand-700">
           {formatPrice(producto.precio)}
         </p>
+
+        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+        {codigoCompra && (
+          <p className="mt-2 rounded-lg bg-emerald-50 px-2 py-1.5 text-xs text-emerald-700">
+            ¡Compra registrada! Código {codigoCompra}. La ves en «Mi cuenta».
+          </p>
+        )}
+
+        {isCliente && producto.creditos > 0 && !codigoCompra && (
+          <button
+            type="button"
+            onClick={handleComprar}
+            disabled={comprando}
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
+          >
+            {comprando ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Coins className="h-4 w-4" />
+            )}
+            {comprando ? 'Procesando…' : `Comprar con ${producto.creditos} créditos`}
+          </button>
+        )}
         <WhatsAppLink
           href={wa.producto(producto)}
           label="Consultar por WhatsApp"
-          className="btn-whatsapp mt-4 w-full"
+          className="btn-whatsapp mt-2 w-full"
         />
       </div>
     </article>

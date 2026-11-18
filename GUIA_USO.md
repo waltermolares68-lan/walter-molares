@@ -1,6 +1,6 @@
 # Capacitación: cómo usar la web
 
-Esta guía explica el uso diario. La web tiene dos partes: el **catálogo público** (lo ve cualquiera) y el **panel de administración** (solo vos).
+Esta guía explica el uso diario. La web tiene tres partes: el **catálogo público** (lo ve cualquiera), la **cuenta del cliente** (saldo y compras) y el **panel de administración** (solo vos).
 
 ---
 
@@ -21,17 +21,39 @@ URL: `https://waltermolares68-lan.github.io/walter-molares/`
 
 ---
 
-## 2. Ingresar como administrador
+## 2. Ingresar (administrador y clientes)
 
-1. Tocá **«Administrador»** arriba a la derecha (o entrá a `/#/login`).
-2. Cargá el email y la contraseña que creaste en Supabase.
-3. Si los datos son correctos, entrás al **Panel**.
+1. Tocá **«Ingresar»** arriba a la derecha (o entrá a `/#/login`).
+2. Cargá tu email y contraseña.
+3. Si sos **administrador**, entrás al **Panel**. Si sos **cliente**, entrás a **Mi cuenta**. Cada uno ve solo lo que le corresponde.
 
-Para salir, tocá **«Salir»** en el menú superior.
+Para salir, tocá **«Salir»** en el menú superior. Los clientes pueden crear su cuenta con **«Crear cuenta»** (o en `/#/registro`).
 
 ---
 
-## 3. Panel de administración
+## 3. Clientes: registro, cuenta y créditos
+
+**Cómo se registran:** tocá **«Crear cuenta»**, completá nombre, email y contraseña (mínimo 6 caracteres). Si Supabase pide confirmación, abrí el correo y confirmá; después ya podés ingresar. No hace falta que yo cree el usuario a mano.
+
+**Qué ve el cliente en «Mi cuenta»:**
+
+- **Saldo disponible** en créditos (1 crédito = 1 USD).
+- **Botón «Recargar créditos»**: elige 10, 20, 30, 40, 50 o 100.
+- **Historial de créditos**: cada recarga suma y cada compra descuenta.
+- **Mis compras**: sus propias compras y estados, con código y fecha.
+
+**Cómo paga un servicio:** el cliente busca el servicio en el catálogo y toca **«Comprar con X créditos»** (solo aparece si el servicio tiene créditos cargados). La compra se registra sola y el saldo se descuenta. Si no alcanza, lo llevamos a recargar.
+
+**Cómo recarga:**
+
+1. En **Mi cuenta** → **«Recargar créditos»**, elige el monto y tocá **«Continuar»**.
+2. Se genera una **referencia única** (`WM-XXXXXXXX`): copiala.
+3. Hacé la transferencia por **Binance Pay** escaneando mi QR y **pegá esa referencia en la nota/referencia del pago**.
+4. El saldo se acredita cuando yo apruebo la solicitud en el panel.
+
+---
+
+## 4. Panel de administración
 
 El panel muestra cuatro números: compras registradas, en curso, listas para entregar y clientes. Debajo están las últimas compras, cada una con su botón de WhatsApp.
 
@@ -43,11 +65,12 @@ Menú superior:
 | **Servicios** | Catálogo (CRUD) |
 | **Clientes** | Registro de clientes (CRUD) |
 | **Compras** | Ventas y reparaciones (CRUD) |
-| **Marca** | Logo, WhatsApp, redes y ubicación |
+| **Recargas** | Aprobar o rechazar recargas de créditos |
+| **Marca** | Logo, textos, WhatsApp, redes, ubicación y QR de Binance Pay |
 
 ---
 
-## 4. Servicios (catálogo)
+## 5. Servicios (catálogo)
 
 En **Servicios** podés crear, editar, ocultar y eliminar.
 
@@ -56,6 +79,7 @@ En **Servicios** podés crear, editar, ocultar y eliminar.
 - **Categoría**: Reparación / Repuesto / Accesorio / Otro.
 - **Nombre** y **Descripción**: lo que ve el cliente.
 - **Precio**: se muestra con el formato `ARS` (ej. `$85.000,00`).
+- **Costo en créditos**: cuántos créditos se descuentan si el cliente paga desde su cuenta. `1 crédito = 1 USD`. Si lo dejás en `0`, el servicio solo se consulta por WhatsApp y no aparece el botón de compra. Podés poner otro número aunque el precio en pesos siga igual.
 - **Visible en el catálogo**: si lo desactivás (`No`), el cliente deja de verlo, pero se conserva para las compras anteriores.
 - **Imagen del servicio**: tocá **«Elegir imagen»** para subir tu propia foto desde la computadora, o pegá una URL de stock con licencia libre (Unsplash/Pexels). También podés **Quitar** la imagen. Si el enlace falla, se muestra un placeholder.
 
@@ -66,7 +90,7 @@ En **Servicios** podés crear, editar, ocultar y eliminar.
 
 ---
 
-## 5. Clientes
+## 6. Clientes
 
 En **Clientes** podés dar de alta, editar y eliminar.
 
@@ -74,11 +98,13 @@ En **Clientes** podés dar de alta, editar y eliminar.
 - **Teléfono**: con código de país y solo dígitos, ej. `5491135834902`.
 - **Dirección** y **Notas**: información interna (no se muestra en el catálogo).
 - El icono verde de WhatsApp escribe directamente a ese cliente.
+- **Saldo**: la columna muestra los créditos disponibles de los clientes registrados en la web. Los que cargaste a mano muestran `—`.
+- Los clientes que se registraron solos aparecen con el badge **Web** al lado del nombre; son los que pueden ingresar a **Mi cuenta**, recargar y pagar con créditos.
 - No se puede eliminar un cliente que tenga compras asociadas.
 
 ---
 
-## 6. Compras y reparaciones
+## 7. Compras y reparaciones
 
 En **Compras** registrás cada venta o trabajo.
 
@@ -112,7 +138,7 @@ Usá **«Filtrar por estado»** para ver, por ejemplo, solo lo que está `Listo`
 
 ---
 
-## 7. Marca, WhatsApp, redes y ubicación
+## 8. Marca, WhatsApp, redes y Binance Pay
 
 En el menú **Marca** podés personalizar el sitio **sin volver a publicar**:
 
@@ -122,6 +148,7 @@ En el menú **Marca** podés personalizar el sitio **sin volver a publicar**:
 - **Redes sociales**: Instagram, Facebook, TikTok y YouTube. Pegá el enlace completo o solo tu usuario (ejemplo `@tuusuario`). Las que dejes vacías no se muestran. Aparecen en la sección **Contacto y redes** del catálogo y como iconos en el pie del sitio.
 - **Ubicación y horario**: dirección, enlace de Google Maps (o la dirección directamente) y horario de atención. Se muestra en la sección **Ubicación** del catálogo, con un enlace **«Cómo llegar»**.
 - **Textos de la pantalla de inicio**: podés cambiar la etiqueta pequeña, el título grande, el párrafo de presentación, el texto de los dos botones y el título/descripción de la sección «Servicios y productos». Si dejás un campo vacío, se usa el texto original.
+- **Binance Pay (recargas)**: subí tu **código QR** (generalo en Binance → Recibir → Binance Pay → Compartir QR) y, si querés, cargá tu **Pay ID** y un **texto de ayuda**. Es lo que ven los clientes al tocar «Recargar créditos». Cada recarga genera una referencia `WM-XXXXXXXX` que el cliente pone como nota de la transferencia; después la aprobás en **Recargas**.
 
 Tocá **«Guardar cambios»** y todo se ve enseguida en el sitio. Arriba del formulario hay una **vista previa** con el logo redondo, el número y los iconos de las redes cargadas.
 
@@ -131,7 +158,21 @@ Tocá **«Guardar cambios»** y todo se ve enseguida en el sitio. Arriba del for
 
 ---
 
-## 8. Problemas frecuentes
+## 9. Recargas: cómo aprobarlas
+
+En **Panel → Recargas** ves las solicitudes de los clientes.
+
+1. Entrá a tu app de **Binance** y buscá la transferencia con la **referencia** que aparece en la fila (por ejemplo `WM-A1B2C3D4`). Revisá el monto: debe ser exactamente US$ 10, 20, 30, 40, 50 o 100.
+2. Si coincide, tocá **«Aprobar»**: se acreditan los créditos automáticamente y aparecen en el historial del cliente.
+3. Si no encontrás el pago o el monto no coincide, tocá **«Rechazar»** y escribí el motivo.
+
+Podés alternar entre **«Solo pendientes»** y **«Ver todas»** para revisar el historial. Si aprobás dos veces la misma recarga, el sistema lo impide.
+
+> Importante: el cliente recibe créditos **solo después** de que apruebes. No apruebes sin verificar la transferencia en tu Binance.
+
+---
+
+## 10. Problemas frecuentes
 
 | Situación | Solución |
 |---|---|
@@ -142,10 +183,15 @@ Tocá **«Guardar cambios»** y todo se ve enseguida en el sitio. Arriba del for
 | Los precios salen con otro símbolo | Revisá los Secrets `VITE_CURRENCY` y `VITE_LOCALE`. |
 | Al tocar «Ver servicios» sale 404 | Recargá la página con `Ctrl+F5`; el enlace ya está corregido en la última versión. |
 | No aparece el menú «Marca» o no puedo subir imágenes | Ejecutá de nuevo `supabase/schema.sql` y revisá que exista el bucket `imagenes`. |
+| Un cliente no puede ingresar | Confirmá que terminó el registro (o el correo de confirmación) y que su email esté en Supabase → Authentication → Users. |
+| Un cliente entra al panel | Ejecutá `supabase/schema.sql` y verificá en `profiles` que su `role` sea `cliente` y el tuyo `admin`. |
+| No ve el saldo ni el botón «Comprar con créditos» | Ejecutá de nuevo el SQL, revisá que `productos.creditos` sea mayor que 0 y refrescá con `Ctrl+F5`. |
+| Hice una transferencia pero no se acreditó | Buscá la referencia `WM-...` en **Panel → Recargas** y aprobala recién después de verificar el pago en Binance. |
+| No se ve mi QR al recargar | Cargalo en **Panel → Marca → Binance Pay**, guardá y probá desde la cuenta de un cliente. |
 
 ---
 
-## 9. Cómo se actualiza la web
+## 11. Cómo se actualiza la web
 
 Los cambios se publican solos cuando se suben a `main`:
 

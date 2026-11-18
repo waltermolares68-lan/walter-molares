@@ -1,6 +1,6 @@
 import { HashRouter, Link, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import { AdminRoute, ClienteRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 import { BrandingProvider } from './context/BrandingContext'
 import Branding from './pages/Branding'
@@ -8,8 +8,11 @@ import Catalogo from './pages/Catalogo'
 import Clientes from './pages/Clientes'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
+import MiCuenta from './pages/MiCuenta'
 import Ordenes from './pages/Ordenes'
 import Productos from './pages/Productos'
+import Recargas from './pages/Recargas'
+import Registro from './pages/Registro'
 
 function NotFound() {
   return (
@@ -31,44 +34,61 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Catalogo />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/registro" element={<Registro />} />
+              <Route
+                path="/mi-cuenta"
+                element={
+                  <ClienteRoute>
+                    <MiCuenta />
+                  </ClienteRoute>
+                }
+              />
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <Dashboard />
-                  </ProtectedRoute>
+                  </AdminRoute>
                 }
               />
               <Route
                 path="/admin/productos"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <Productos />
-                  </ProtectedRoute>
+                  </AdminRoute>
                 }
               />
               <Route
                 path="/admin/clientes"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <Clientes />
-                  </ProtectedRoute>
+                  </AdminRoute>
                 }
               />
               <Route
                 path="/admin/ordenes"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <Ordenes />
-                  </ProtectedRoute>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/recargas"
+                element={
+                  <AdminRoute>
+                    <Recargas />
+                  </AdminRoute>
                 }
               />
               <Route
                 path="/admin/marca"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <Branding />
-                  </ProtectedRoute>
+                  </AdminRoute>
                 }
               />
               <Route path="*" element={<NotFound />} />

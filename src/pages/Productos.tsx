@@ -21,6 +21,7 @@ interface FormState {
   categoria: Categoria
   descripcion: string
   precio: string
+  creditos: string
   imagen_url: string
   activo: boolean
 }
@@ -32,6 +33,7 @@ function emptyForm(codigo: string): FormState {
     categoria: 'Reparación',
     descripcion: '',
     precio: '',
+    creditos: '0',
     imagen_url: '',
     activo: true,
   }
@@ -76,6 +78,7 @@ export default function Productos() {
       categoria: producto.categoria,
       descripcion: producto.descripcion,
       precio: String(producto.precio),
+      creditos: String(producto.creditos ?? 0),
       imagen_url: producto.imagen_url,
       activo: producto.activo,
     })
@@ -97,6 +100,7 @@ export default function Productos() {
       categoria: form.categoria,
       descripcion: form.descripcion.trim(),
       precio: Number(form.precio) || 0,
+      creditos: Math.max(0, Math.trunc(Number(form.creditos) || 0)),
       imagen_url: form.imagen_url.trim(),
       activo: form.activo,
     }
@@ -173,6 +177,7 @@ export default function Productos() {
                   <th className="px-4 py-3">Servicio</th>
                   <th className="px-4 py-3">Categoría</th>
                   <th className="px-4 py-3">Precio</th>
+                  <th className="px-4 py-3">Créditos</th>
                   <th className="px-4 py-3">Visible</th>
                   <th className="px-4 py-3">Acciones</th>
                 </tr>
@@ -187,6 +192,15 @@ export default function Productos() {
                     </td>
                     <td className="px-4 py-3 text-slate-600">{producto.categoria}</td>
                     <td className="px-4 py-3 font-semibold text-slate-800">{formatPrice(producto.precio)}</td>
+                    <td className="px-4 py-3">
+                      {producto.creditos > 0 ? (
+                        <span className="badge bg-brand-100 text-brand-700">
+                          {producto.creditos} cr.
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`badge ${producto.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                         {producto.activo ? 'Sí' : 'No'}
@@ -248,16 +262,19 @@ export default function Productos() {
             <textarea className="input min-h-[80px]" value={form.descripcion} onChange={(e) => updateField('descripcion', e.target.value)} />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Precio">
+            <Field label="Precio (AR$)">
               <input type="number" min="0" step="0.01" className="input" value={form.precio} onChange={(e) => updateField('precio', e.target.value)} required />
             </Field>
-            <Field label="Visible en el catálogo" hint="Desactivá en lugar de eliminar si ya tiene compras.">
-              <select className="input" value={form.activo ? 'si' : 'no'} onChange={(e) => updateField('activo', e.target.value === 'si')}>
-                <option value="si">Sí, visible</option>
-                <option value="no">No, oculto</option>
-              </select>
+            <Field label="Costo en créditos" hint="1 crédito = 1 USD. Si ponés 0, solo se consulta por WhatsApp.">
+              <input type="number" min="0" step="1" className="input" value={form.creditos} onChange={(e) => updateField('creditos', e.target.value)} />
             </Field>
           </div>
+          <Field label="Visible en el catálogo" hint="Desactivá en lugar de eliminar si ya tiene compras.">
+            <select className="input" value={form.activo ? 'si' : 'no'} onChange={(e) => updateField('activo', e.target.value === 'si')}>
+              <option value="si">Sí, visible</option>
+              <option value="no">No, oculto</option>
+            </select>
+          </Field>
           <ImageUpload
             label="Imagen del servicio"
             value={form.imagen_url}

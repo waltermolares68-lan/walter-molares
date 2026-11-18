@@ -8,7 +8,14 @@ import {
   Modal,
   Spinner,
 } from '../components/ui'
-import { createCliente, deleteCliente, getClientes, updateCliente, type ClienteInput } from '../lib/data'
+import {
+  createCliente,
+  deleteCliente,
+  getClientes,
+  getSaldosPorUsuario,
+  updateCliente,
+  type ClienteInput,
+} from '../lib/data'
 import { formatDate } from '../lib/format'
 import type { Cliente } from '../types'
 
@@ -23,6 +30,7 @@ const emptyForm: FormState = { nombre: '', telefono: '', direccion: '', notas: '
 
 export default function Clientes() {
   const [clientes, setClientes] = useState<Cliente[]>([])
+  const [saldos, setSaldos] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [pageError, setPageError] = useState('')
   const [error, setError] = useState('')
@@ -36,8 +44,11 @@ export default function Clientes() {
 
   function cargar() {
     setLoading(true)
-    getClientes()
-      .then(setClientes)
+    Promise.all([getClientes(), getSaldosPorUsuario()])
+      .then(([lista, montos]) => {
+        setClientes(lista)
+        setSaldos(montos)
+      })
       .catch((err: Error) => setPageError(err.message))
       .finally(() => setLoading(false))
   }
@@ -140,6 +151,7 @@ export default function Clientes() {
                   <th className="px-4 py-3">Nombre</th>
                   <th className="px-4 py-3">Teléfono</th>
                   <th className="px-4 py-3">Dirección</th>
+                  <th className="px-4 py-3">Saldo</th>
                   <th className="px-4 py-3">Alta</th>
                   <th className="px-4 py-3">Acciones</th>
                 </tr>
@@ -150,11 +162,19 @@ export default function Clientes() {
                   return (
                     <tr key={cliente.id} className="hover:bg-slate-50">
                       <td className="px-4 py-3">
-                        <p className="font-medium text-slate-800">{cliente.nombre}</p>
+                        <p className="font-medium text-slate-800">
+                          {cliente.nombre}{' '}
+                          {cliente.user_id && (
+                            <span className="badge bg-brand-100 text-brand-700">Web</span>
+                          )}
+                        </p>
                         <p className="max-w-xs truncate text-xs text-slate-400">{cliente.notas}</p>
                       </td>
                       <td className="px-4 py-3 text-slate-600">{cliente.telefono || '—'}</td>
                       <td className="px-4 py-3 text-slate-600">{cliente.direccion || '—'}</td>
+                      <td className="px-4 py-3 font-semibold text-brand-700">
+                        {cliente.user_id ? (saldos[cliente.user_id] ?? 0) : '—'}
+                      </td>
                       <td className="px-4 py-3 text-xs text-slate-500">{formatDate(cliente.created_at)}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">

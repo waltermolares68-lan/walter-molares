@@ -119,6 +119,7 @@ export default function Ordenes() {
       producto_id: form.producto_id,
       estado: form.estado,
       precio: Number(form.precio) || 0,
+      creditos_usados: 0,
       notas: form.notas.trim(),
     }
 

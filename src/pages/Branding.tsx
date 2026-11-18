@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Facebook, Instagram, Music2, Palette, Youtube } from 'lucide-react'
+import { Facebook, Instagram, Music2, Palette, QrCode, Youtube } from 'lucide-react'
 import { ImageUpload } from '../components/ImageUpload'
 import { ErrorAlert, Field } from '../components/ui'
 import { useBranding } from '../context/BrandingContext'
@@ -33,6 +33,9 @@ export default function Branding() {
   const [heroBotonWhatsapp, setHeroBotonWhatsapp] = useState(branding.hero_boton_whatsapp || defaultBranding.hero_boton_whatsapp)
   const [serviciosTitulo, setServiciosTitulo] = useState(branding.servicios_titulo || defaultBranding.servicios_titulo)
   const [serviciosDescripcion, setServiciosDescripcion] = useState(branding.servicios_descripcion || defaultBranding.servicios_descripcion)
+  const [binancePayId, setBinancePayId] = useState(branding.binance_pay_id || defaultBranding.binance_pay_id)
+  const [binanceQrUrl, setBinanceQrUrl] = useState(branding.binance_qr_url || defaultBranding.binance_qr_url)
+  const [binanceNota, setBinanceNota] = useState(branding.binance_nota || defaultBranding.binance_nota)
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
@@ -55,6 +58,9 @@ export default function Branding() {
     setHeroBotonWhatsapp(branding.hero_boton_whatsapp || defaultBranding.hero_boton_whatsapp)
     setServiciosTitulo(branding.servicios_titulo || defaultBranding.servicios_titulo)
     setServiciosDescripcion(branding.servicios_descripcion || defaultBranding.servicios_descripcion)
+    setBinancePayId(branding.binance_pay_id || defaultBranding.binance_pay_id)
+    setBinanceQrUrl(branding.binance_qr_url || defaultBranding.binance_qr_url)
+    setBinanceNota(branding.binance_nota || defaultBranding.binance_nota)
   }, [branding])
 
   const whatsappDigits = whatsapp.replace(/\D/g, '')
@@ -83,6 +89,9 @@ export default function Branding() {
       hero_boton_whatsapp: heroBotonWhatsapp.trim(),
       servicios_titulo: serviciosTitulo.trim(),
       servicios_descripcion: serviciosDescripcion.trim(),
+      binance_pay_id: binancePayId.trim(),
+      binance_qr_url: binanceQrUrl,
+      binance_nota: binanceNota.trim(),
     }
 
     if (!payload.whatsapp) {
@@ -109,8 +118,8 @@ export default function Branding() {
           <Palette className="h-7 w-7 text-brand-600" /> Marca y presentación
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Cambiá el logo, los textos del inicio, el WhatsApp, las redes y la ubicación. Todo se
-          refleja en el sitio al instante, sin volver a publicar.
+          Cambiá el logo, los textos del inicio, el WhatsApp, las redes, la ubicación y el QR de
+          Binance Pay. Todo se refleja en el sitio al instante, sin volver a publicar.
         </p>
       </div>
 
@@ -295,6 +304,49 @@ export default function Branding() {
           <Field label="Descripción de la sección de servicios">
             <textarea className="input min-h-[70px]" value={serviciosDescripcion} onChange={(e) => setServiciosDescripcion(e.target.value)} />
           </Field>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="flex items-center gap-2 border-b border-slate-200 pb-2 text-base font-bold text-slate-900">
+            <QrCode className="h-5 w-5 text-brand-600" /> Binance Pay (recargas)
+          </h2>
+          <p className="text-xs leading-5 text-slate-500">
+            Los clientes van a ver este QR al recargar. Generá el código QR de tu Binance Pay desde
+            la app de Binance → Recibir → Binance Pay → Compartir QR, guardalo en tu celular y
+            subilo acá. Cada recarga genera una referencia única que el cliente pone como nota de la
+            transferencia.
+          </p>
+          <ImageUpload
+            label="QR de Binance Pay"
+            value={binanceQrUrl}
+            onChange={setBinanceQrUrl}
+            folder="marca"
+            hint="Subí una imagen cuadrada con tu código QR. Es la que verán los clientes al elegir «Recargar créditos»."
+            previewClass="h-32 w-32 object-contain"
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Binance Pay ID (opcional)" hint="Tu usuario o Pay ID, para que el cliente pueda buscarte.">
+              <input
+                className="input"
+                value={binancePayId}
+                onChange={(e) => setBinancePayId(e.target.value)}
+                placeholder="Ejemplo: 123456789"
+              />
+            </Field>
+            <Field label="Texto de ayuda (opcional)">
+              <input
+                className="input"
+                value={binanceNota}
+                onChange={(e) => setBinanceNota(e.target.value)}
+                placeholder="Cómo poner la referencia en la transferencia"
+              />
+            </Field>
+          </div>
+          <div className="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-800">
+            <strong>Importante:</strong> configurá el QR antes de habilitar recargas. Después de que
+            el cliente transfiera, aprobá la recarga en <strong>Panel → Recargas</strong> y los
+            créditos se acreditan automáticamente.
+          </div>
         </section>
 
         <div className="flex justify-end border-t border-slate-200 pt-4">

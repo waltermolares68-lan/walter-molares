@@ -12,6 +12,7 @@ export const demoProductos: Producto[] = [
     categoria: 'Reparación',
     descripcion: 'Servicio de ejemplo: reemplazo de pantalla.',
     precio: 85000,
+    creditos: 20,
     imagen_url:
       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80',
     activo: true,
@@ -24,6 +25,7 @@ export const demoProductos: Producto[] = [
     categoria: 'Reparación',
     descripcion: 'Servicio de ejemplo: reemplazo de batería.',
     precio: 45000,
+    creditos: 10,
     imagen_url:
       'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80',
     activo: true,
@@ -36,6 +38,7 @@ export const demoProductos: Producto[] = [
     categoria: 'Accesorio',
     descripcion: 'Producto de ejemplo: funda universal.',
     precio: 12000,
+    creditos: 0,
     imagen_url:
       'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=800&q=80',
     activo: true,
@@ -48,6 +51,7 @@ export const demoProductos: Producto[] = [
     categoria: 'Repuesto',
     descripcion: 'Repuesto de ejemplo sin marca ni modelo específico.',
     precio: 22000,
+    creditos: 5,
     imagen_url:
       'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=800&q=80',
     activo: false,
@@ -82,6 +86,7 @@ export const demoOrdenes: Orden[] = [
     producto_id: 'demo-p1',
     estado: 'En reparación',
     precio: 85000,
+    creditos_usados: 0,
     notas: 'Compra de ejemplo.',
     created_at: '2026-11-10T10:00:00.000Z',
     updated_at: '2026-11-10T10:00:00.000Z',
@@ -93,6 +98,7 @@ export const demoOrdenes: Orden[] = [
     producto_id: 'demo-p2',
     estado: 'Listo',
     precio: 45000,
+    creditos_usados: 0,
     notas: 'Compra de ejemplo.',
     created_at: '2026-11-11T11:00:00.000Z',
     updated_at: '2026-11-11T11:00:00.000Z',
@@ -104,6 +110,7 @@ export const demoOrdenes: Orden[] = [
     producto_id: 'demo-p3',
     estado: 'Entregado',
     precio: 12000,
+    creditos_usados: 0,
     notas: 'Compra de ejemplo.',
     created_at: '2026-11-12T12:00:00.000Z',
     updated_at: '2026-11-12T12:00:00.000Z',

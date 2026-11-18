@@ -2,12 +2,15 @@ import { useState, type ReactNode } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   ClipboardList,
+  Coins,
   Home,
   LayoutDashboard,
   LogIn,
   LogOut,
   Menu,
   Palette,
+  UserPlus,
+  UserRound,
   Users,
   Wrench,
   X,
@@ -22,11 +25,12 @@ const adminLinks = [
   { to: '/admin/productos', label: 'Servicios', icon: Wrench, end: false },
   { to: '/admin/clientes', label: 'Clientes', icon: Users, end: false },
   { to: '/admin/ordenes', label: 'Compras', icon: ClipboardList, end: false },
+  { to: '/admin/recargas', label: 'Recargas', icon: Coins, end: false },
   { to: '/admin/marca', label: 'Marca', icon: Palette, end: false },
 ]
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { isAdmin, isDemo, signOut, user } = useAuth()
+  const { isAdmin, isCliente, isDemo, signOut, user } = useAuth()
   const { logoUrl } = useBranding()
   const wa = useWhatsapp()
   const redes = useSocialLinks()
@@ -83,22 +87,37 @@ export function Layout({ children }: { children: ReactNode }) {
                   <Icon className="h-4 w-4" /> {label}
                 </NavLink>
               ))}
+            {isCliente && (
+              <NavLink to="/mi-cuenta" className={linkClass}>
+                <UserRound className="h-4 w-4" /> Mi cuenta
+              </NavLink>
+            )}
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
-            {isAdmin ? (
+            {user ? (
               <>
-                <span className="max-w-[150px] truncate text-xs text-slate-500" title={user?.email}>
-                  {user?.email}
+                {isCliente && (
+                  <Link to="/mi-cuenta" className="btn-ghost">
+                    <Coins className="h-4 w-4" /> Mis créditos
+                  </Link>
+                )}
+                <span className="max-w-[150px] truncate text-xs text-slate-500" title={user.email}>
+                  {user.email}
                 </span>
                 <button type="button" onClick={handleSignOut} className="btn-ghost">
                   <LogOut className="h-4 w-4" /> Salir
                 </button>
               </>
             ) : (
-              <Link to="/login" className="btn-primary">
-                <LogIn className="h-4 w-4" /> Administrador
-              </Link>
+              <>
+                <Link to="/registro" className="btn-ghost">
+                  <UserPlus className="h-4 w-4" /> Crear cuenta
+                </Link>
+                <Link to="/login" className="btn-primary">
+                  <LogIn className="h-4 w-4" /> Ingresar
+                </Link>
+              </>
             )}
           </div>
 
@@ -130,18 +149,36 @@ export function Layout({ children }: { children: ReactNode }) {
                     <Icon className="h-4 w-4" /> {label}
                   </NavLink>
                 ))}
-              {isAdmin ? (
+              {isCliente && (
+                <NavLink
+                  to="/mi-cuenta"
+                  className={linkClass}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <UserRound className="h-4 w-4" /> Mi cuenta
+                </NavLink>
+              )}
+              {user ? (
                 <button type="button" onClick={handleSignOut} className={`${linkClass} text-left`}>
                   <LogOut className="h-4 w-4" /> Salir
                 </button>
               ) : (
-                <NavLink
-                  to="/login"
-                  className={linkClass}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <LogIn className="h-4 w-4" /> Administrador
-                </NavLink>
+                <>
+                  <NavLink
+                    to="/registro"
+                    className={linkClass}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <UserPlus className="h-4 w-4" /> Crear cuenta
+                  </NavLink>
+                  <NavLink
+                    to="/login"
+                    className={linkClass}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <LogIn className="h-4 w-4" /> Ingresar
+                  </NavLink>
+                </>
               )}
             </div>
           </div>
