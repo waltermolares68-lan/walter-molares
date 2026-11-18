@@ -508,7 +508,7 @@ begin
    where user_id = v_uid;
 
   if v_saldo < v_prod.creditos then
-    raise exception 'Saldo insuficiente: tenés ' || v_saldo || ' créditos y necesitás ' || v_prod.creditos || '.';
+    raise exception 'Saldo insuficiente: tenés % créditos y necesitás %.', v_saldo, v_prod.creditos;
   end if;
 
   v_codigo := 'ORD-' || lpad(
