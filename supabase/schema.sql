@@ -180,6 +180,36 @@ begin
   end loop;
 end $$;
 
+-- Reparación de revisada_por: en tablas viejas puede apuntar a public.clientes.
+-- Al aprobar, el admin guarda su auth.uid(), así que debe referenciar auth.users.
+do $$
+declare
+  v_attnum int;
+  c record;
+begin
+  select attnum into v_attnum
+    from pg_attribute
+   where attrelid = 'public.recargas'::regclass
+     and attname = 'revisada_por'
+     and not attisdropped;
+
+  if v_attnum is not null then
+    execute 'alter table public.recargas alter column revisada_por drop not null';
+
+    for c in
+      select conname
+        from pg_constraint
+       where conrelid = 'public.recargas'::regclass
+         and contype = 'f'
+         and v_attnum = any(conkey)
+    loop
+      execute format('alter table public.recargas drop constraint %I', c.conname);
+    end loop;
+
+    execute 'alter table public.recargas add constraint recargas_revisada_por_fkey foreign key (revisada_por) references auth.users(id) on delete set null';
+  end if;
+end $$;
+
 create index if not exists movimientos_user_idx on public.movimientos_creditos (user_id);
 create index if not exists recargas_user_idx on public.recargas (user_id);
 
@@ -509,8 +539,9 @@ begin
    where id = p_recarga_id
   returning * into v_row;
 
-  insert into public.movimientos_creditos (user_id, tipo, creditos, descripcion, recarga_id)
-  values (v_row.user_id, 'recarga', v_row.creditos, 'Recarga aprobada (' || v_row.referencia || ')', v_row.id);
+  insert into public.movimientos_creditos (id, user_id, tipo, creditos, descripcion, recarga_id)
+  values (gen_random_uuid(), v_row.user_id, 'recarga', v_row.creditos,
+          'Recarga aprobada (' || v_row.referencia || ')', v_row.id);
 
   return v_row;
 end;
