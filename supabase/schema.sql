@@ -702,7 +702,8 @@ $$;
 
 -- ==================== Avisos por email: administrador y cliente ====================
 -- Se dispara cuando se crea una compra en estado «Pendiente».
--- Necesitás dos secretos en Supabase Vault: RESEND_API_KEY y RESEND_FROM.
+-- Necesitás dos secretos en Supabase Vault: BREVO_API_KEY y BREVO_FROM.
+-- El remitente debe estar verificado en Brevo (Senders & Domains).
 -- Si no están cargados, la compra se crea igual y solo se muestra un aviso en el panel.
 do $$
 begin
@@ -733,12 +734,12 @@ begin
   end if;
 
   select decrypted_secret into v_api_key
-    from vault.decrypted_secrets where name = 'RESEND_API_KEY' limit 1;
+    from vault.decrypted_secrets where name = 'BREVO_API_KEY' limit 1;
   select decrypted_secret into v_from
-    from vault.decrypted_secrets where name = 'RESEND_FROM' limit 1;
+    from vault.decrypted_secrets where name = 'BREVO_FROM' limit 1;
 
   if coalesce(v_api_key, '') = '' or coalesce(v_from, '') = '' then
-    raise notice 'Aviso por email no configurado: cargá RESEND_API_KEY y RESEND_FROM en Supabase Vault.';
+    raise notice 'Aviso por email no configurado: cargá BREVO_API_KEY y BREVO_FROM en Supabase Vault.';
     return new;
   end if;
 
@@ -772,16 +773,19 @@ begin
            || '</div>';
 
     v_payload := jsonb_build_object(
-      'from', v_from,
-      'to', jsonb_build_array(v_admin_email),
+      'sender', jsonb_build_object(
+        'name', 'Servicio Tecnico Walter Molares',
+        'email', v_from
+      ),
+      'to', jsonb_build_array(jsonb_build_object('email', v_admin_email)),
       'subject', 'Nueva compra pendiente ' || coalesce(new.codigo, ''),
-      'html', v_html
+      'htmlContent', v_html
     );
 
     perform net.http_post(
-      url := 'https://api.resend.com/emails',
+      url := 'https://api.brevo.com/v3/smtp/email',
       headers := jsonb_build_object(
-        'Authorization', 'Bearer ' || v_api_key,
+        'api-key', v_api_key,
         'Content-Type', 'application/json'
       ),
       body := v_payload
@@ -804,16 +808,19 @@ begin
            || '</div>';
 
     v_payload := jsonb_build_object(
-      'from', v_from,
-      'to', jsonb_build_array(v_cliente_email),
+      'sender', jsonb_build_object(
+        'name', 'Servicio Tecnico Walter Molares',
+        'email', v_from
+      ),
+      'to', jsonb_build_array(jsonb_build_object('email', v_cliente_email)),
       'subject', 'Compra confirmada ' || coalesce(new.codigo, '') || ' - Servicio Tecnico Walter Molares',
-      'html', v_html
+      'htmlContent', v_html
     );
 
     perform net.http_post(
-      url := 'https://api.resend.com/emails',
+      url := 'https://api.brevo.com/v3/smtp/email',
       headers := jsonb_build_object(
-        'Authorization', 'Bearer ' || v_api_key,
+        'api-key', v_api_key,
         'Content-Type', 'application/json'
       ),
       body := v_payload

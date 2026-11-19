@@ -32,21 +32,17 @@ revoke all on function public.saldo_creditos() from public;
 grant execute on function public.saldo_creditos() to authenticated;
 `
 
-const secretos = `-- Reemplazá la clave por la tuya. El remitente lo dejamos así para probar.
+const secretos = `-- Reemplazá la key por la que creaste en Brevo.
+-- El remitente debe ser el correo que verificaste en Brevo.
 delete from vault.secrets
-where name in ('RESEND_API_KEY', 'RESEND_FROM');
+where name in ('BREVO_API_KEY', 'BREVO_FROM');
 
-select vault.create_secret('re_AQUI_TU_KEY_NUEVA', 'RESEND_API_KEY');
+select vault.create_secret('TU_API_KEY_DE_BREVO', 'BREVO_API_KEY');
 
-select vault.create_secret(
-  'Servicio Tecnico Walter Molares <onboarding@resend.dev>',
-  'RESEND_FROM'
-);
+select vault.create_secret('waltermolares68@gmail.com', 'BREVO_FROM');
 
--- IMPORTANTE: onboarding@resend.dev solo entrega al correo de tu cuenta de Resend.
--- Para que el cliente reciba su confirmación, verificá un dominio en Resend
--- y reemplazá el remitente por uno propio, por ejemplo:
--- 'Servicio Tecnico Walter Molares <no-reply@TU_DOMINIO_VERIFICADO>'
+-- El nombre del remitente es 'Servicio Tecnico Walter Molares'
+-- y ya está cargado en el esquema, no hace falta ponerlo acá.
 `
 
 const prueba = `-- Prueba directa: envía un correo a tu email de admin.
@@ -56,36 +52,35 @@ declare
   v_from text;
 begin
   select decrypted_secret into v_key
-    from vault.decrypted_secrets where name = 'RESEND_API_KEY';
+    from vault.decrypted_secrets where name = 'BREVO_API_KEY';
 
   select decrypted_secret into v_from
-    from vault.decrypted_secrets where name = 'RESEND_FROM';
+    from vault.decrypted_secrets where name = 'BREVO_FROM';
 
   perform net.http_post(
-    url := 'https://api.resend.com/emails',
+    url := 'https://api.brevo.com/v3/smtp/email',
     headers := jsonb_build_object(
-      'Authorization', 'Bearer ' || v_key,
+      'api-key', v_key,
       'Content-Type', 'application/json'
     ),
     body := jsonb_build_object(
-      'from', v_from,
-      'to', jsonb_build_array('waltermolares68@gmail.com'),
+      'sender', jsonb_build_object(
+        'name', 'Servicio Tecnico Walter Molares',
+        'email', v_from
+      ),
+      'to', jsonb_build_array(jsonb_build_object('email', 'waltermolares68@gmail.com')),
       'subject', 'Prueba de aviso - Walter Molares',
-      'html', '<p>Si llegó, Resend funciona.</p>'
+      'htmlContent', '<p>Si llegó, Brevo funciona.</p>'
     )
   );
 end $$;
 `
 
-const remitente = `-- Solo cuando tu dominio ya esté verificado en Resend.
--- Reemplazá el remitente por una dirección de ese dominio.
+const remitente = `-- Solo si querés cambiar el correo remitente verificado.
 -- No toca la API key.
-delete from vault.secrets where name = 'RESEND_FROM';
+delete from vault.secrets where name = 'BREVO_FROM';
 
-select vault.create_secret(
-  'Servicio Tecnico Walter Molares <no-reply@TU_DOMINIO_VERIFICADO>',
-  'RESEND_FROM'
-);
+select vault.create_secret('TU_CORREO_VERIFICADO@ejemplo.com', 'BREVO_FROM');
 `
 
 const html = `<!doctype html>
@@ -141,8 +136,8 @@ const html = `<!doctype html>
   <section>
     <div class="head">
       <div>
-        <h2>3. Correo de aviso (Resend)</h2>
-        <small>Reemplazá solo la clave. El remitente se deja así para probar.</small>
+        <h2>3. Correo de aviso (Brevo)</h2>
+        <small>Reemplazá la key por la de Brevo. El remitente es el correo que verificaste.</small>
       </div>
       <button type="button" onclick="copiar('secretos', this)">Copiar</button>
     </div>
@@ -158,19 +153,19 @@ const html = `<!doctype html>
       <button type="button" onclick="copiar('prueba', this)">Copiar</button>
     </div>
     <pre><code id="prueba">${esc(prueba)}</code></pre>
-    <div class="nota">Si este correo llega pero el aviso de compra no, el problema está en el disparador, no en Resend.</div>
+    <div class="nota">Si este correo llega pero el aviso de compra no, el problema está en el disparador, no en Brevo.</div>
   </section>
 
   <section>
     <div class="head">
       <div>
-        <h2>5. Cambiar el remitente cuando tu dominio esté verificado</h2>
-        <small>Para que el correo del cliente llegue a cualquier email. No toca la API key.</small>
+        <h2>5. Cambiar el correo remitente verificado</h2>
+        <small>Cambiá solo el correo verificado en Brevo. No toca la API key.</small>
       </div>
       <button type="button" onclick="copiar('remitente', this)">Copiar</button>
     </div>
     <pre><code id="remitente">${esc(remitente)}</code></pre>
-    <div class="nota">Con onboarding@resend.dev solo llega a tu correo de Resend. Usá este bloque recién cuando Resend diga que tu dominio está verificado.</div>
+    <div class="nota">El correo debe estar verificado en Brevo → Senders &amp; Domains. Si no, Brevo rechaza el envío.</div>
   </section>
 </main>
 <script>
