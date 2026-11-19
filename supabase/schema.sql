@@ -146,6 +146,40 @@ begin
   end loop;
 end $$;
 
+-- Reparación de foreign keys: tablas viejas pueden tener user_id apuntando a
+-- public.clientes en vez de auth.users. Se reemplaza por la referencia correcta.
+do $$
+declare
+  v_table text;
+  v_attnum int;
+  c record;
+begin
+  foreach v_table in array array['recargas', 'movimientos_creditos'] loop
+    select attnum into v_attnum
+      from pg_attribute
+     where attrelid = ('public.' || v_table)::regclass
+       and attname = 'user_id'
+       and not attisdropped;
+
+    if v_attnum is not null then
+      for c in
+        select conname
+          from pg_constraint
+         where conrelid = ('public.' || v_table)::regclass
+           and contype = 'f'
+           and v_attnum = any(conkey)
+      loop
+        execute format('alter table public.%I drop constraint %I', v_table, c.conname);
+      end loop;
+
+      execute format(
+        'alter table public.%I add constraint %I foreign key (user_id) references auth.users(id) on delete cascade',
+        v_table, v_table || '_user_id_fkey'
+      );
+    end if;
+  end loop;
+end $$;
+
 create index if not exists movimientos_user_idx on public.movimientos_creditos (user_id);
 create index if not exists recargas_user_idx on public.recargas (user_id);
 
