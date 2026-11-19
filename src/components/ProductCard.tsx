@@ -13,12 +13,16 @@ export function ProductCard({ producto }: { producto: Producto }) {
   const [comprando, setComprando] = useState(false)
   const [error, setError] = useState('')
   const [codigoCompra, setCodigoCompra] = useState('')
-  const { isCliente, user } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const wa = useWhatsapp()
 
   async function handleComprar() {
-    if (!user || producto.creditos <= 0) return
+    if (producto.creditos <= 0) return
+    if (!user) {
+      navigate('/login')
+      return
+    }
     setComprando(true)
     setError('')
     setCodigoCompra('')
@@ -80,26 +84,37 @@ export function ProductCard({ producto }: { producto: Producto }) {
           </p>
         )}
 
-        {isCliente && producto.creditos > 0 && !codigoCompra && (
+        <div className="mt-4 flex gap-2">
           <button
             type="button"
             onClick={handleComprar}
-            disabled={comprando}
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
+            disabled={comprando || producto.creditos <= 0}
+            title={
+              producto.creditos <= 0
+                ? 'Este servicio todavía no tiene costo en créditos. Consultá por WhatsApp.'
+                : undefined
+            }
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {comprando ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Coins className="h-4 w-4" />
             )}
-            {comprando ? 'Procesando…' : `Comprar con ${producto.creditos} créditos`}
+            {producto.creditos <= 0
+              ? 'Sin créditos'
+              : !user
+                ? 'Ingresá para comprar'
+                : comprando
+                  ? 'Procesando…'
+                  : `Comprar con ${producto.creditos} créditos`}
           </button>
-        )}
-        <WhatsAppLink
-          href={wa.producto(producto)}
-          label="Consultar por WhatsApp"
-          className="btn-whatsapp mt-2 w-full"
-        />
+          <WhatsAppLink
+            href={wa.producto(producto)}
+            label="Consultar por WhatsApp"
+            className="btn-whatsapp flex-1 px-3 py-2.5 text-xs"
+          />
+        </div>
       </div>
     </article>
   )

@@ -33,7 +33,7 @@ function emptyForm(codigo: string): FormState {
     categoria: 'Reparación',
     descripcion: '',
     precio: '',
-    creditos: '0',
+    creditos: '1',
     imagen_url: '',
     activo: true,
   }
@@ -265,7 +265,7 @@ export default function Productos() {
             <Field label="Precio (AR$)">
               <input type="number" min="0" step="0.01" className="input" value={form.precio} onChange={(e) => updateField('precio', e.target.value)} required />
             </Field>
-            <Field label="Costo en créditos" hint="1 crédito = 1 USD. Si ponés 0, solo se consulta por WhatsApp.">
+            <Field label="Costo en créditos" hint="1 crédito = 1 USD. Viene en 1 para habilitar la compra; poné 0 si solo se consulta por WhatsApp.">
               <input type="number" min="0" step="1" className="input" value={form.creditos} onChange={(e) => updateField('creditos', e.target.value)} />
             </Field>
           </div>
