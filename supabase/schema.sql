@@ -779,7 +779,7 @@ begin
       'Authorization', 'Bearer ' || v_api_key,
       'Content-Type', 'application/json'
     ),
-    body := v_payload::text
+    body := v_payload
   );
 
   return new;
