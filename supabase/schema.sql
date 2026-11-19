@@ -376,7 +376,7 @@ $$;
 create or replace function public.solicitar_recarga(p_creditos integer, p_nota text default '')
 returns public.recargas
 language plpgsql
-security invoker
+security definer
 set search_path = public
 as $$
 declare

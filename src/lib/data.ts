@@ -62,7 +62,7 @@ export async function getProductos(includeInactive = true): Promise<Producto[]> 
     let query = supabase.from('productos').select('*').order('codigo', { ascending: true })
     if (!includeInactive) query = query.eq('activo', true)
     const { data, error } = await query
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return (data ?? []).map((row) => {
       const item = row as Producto
       return { ...item, precio: toNumber(item.precio), creditos: toNumber(item.creditos) }
@@ -78,7 +78,7 @@ export async function getProductos(includeInactive = true): Promise<Producto[]> 
 export async function createProducto(input: ProductoInput): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('productos').insert(input)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const all = readLocal<Producto>(KEY.productos, demoProductos)
@@ -89,7 +89,7 @@ export async function createProducto(input: ProductoInput): Promise<void> {
 export async function updateProducto(id: string, input: Partial<ProductoInput>): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('productos').update(input).eq('id', id)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const all = readLocal<Producto>(KEY.productos, demoProductos)
@@ -103,7 +103,7 @@ export async function deleteProducto(id: string): Promise<void> {
   }
   if (supabase) {
     const { error } = await supabase.from('productos').delete().eq('id', id)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   writeLocal(
@@ -119,7 +119,7 @@ export type ClienteInput = Omit<Cliente, 'id' | 'created_at'>
 export async function getClientes(): Promise<Cliente[]> {
   if (supabase) {
     const { data, error } = await supabase.from('clientes').select('*').order('nombre')
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return (data ?? []) as Cliente[]
   }
   return readLocal<Cliente>(KEY.clientes, demoClientes).sort((a, b) =>
@@ -130,7 +130,7 @@ export async function getClientes(): Promise<Cliente[]> {
 export async function createCliente(input: ClienteInput): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('clientes').insert(input)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const all = readLocal<Cliente>(KEY.clientes, demoClientes)
@@ -141,7 +141,7 @@ export async function createCliente(input: ClienteInput): Promise<void> {
 export async function updateCliente(id: string, input: Partial<ClienteInput>): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('clientes').update(input).eq('id', id)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const all = readLocal<Cliente>(KEY.clientes, demoClientes)
@@ -155,7 +155,7 @@ export async function deleteCliente(id: string): Promise<void> {
   }
   if (supabase) {
     const { error } = await supabase.from('clientes').delete().eq('id', id)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   writeLocal(
@@ -174,7 +174,7 @@ export async function getOrdenes(): Promise<OrdenConDetalle[]> {
       .from('ordenes')
       .select('*, cliente:clientes(*), producto:productos(*)')
       .order('created_at', { ascending: false })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return (data ?? []).map((row) => {
       const item = row as OrdenConDetalle & { cliente: unknown; producto: unknown }
       return {
@@ -222,7 +222,7 @@ export async function createOrden(input: OrdenInput): Promise<OrdenConDetalle> {
       .insert({ ...input, codigo })
       .select('*')
       .single()
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return { ...(data as Orden), cliente: undefined, producto: undefined }
   }
 
@@ -239,7 +239,7 @@ export async function updateOrden(id: string, input: Partial<OrdenInput>): Promi
       .from('ordenes')
       .update({ ...input, updated_at: new Date().toISOString() })
       .eq('id', id)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const all = readLocal<Orden>(KEY.ordenes, demoOrdenes)
@@ -254,7 +254,7 @@ export async function updateOrden(id: string, input: Partial<OrdenInput>): Promi
 export async function deleteOrden(id: string): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('ordenes').delete().eq('id', id)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   writeLocal(
@@ -298,7 +298,7 @@ export async function getBranding(): Promise<Branding> {
       .select('*')
       .eq('id', true)
       .maybeSingle()
-    if (error) throw error
+    if (error) throw new Error(error.message)
     // Se mezclan los valores por defecto por si la fila aún no tiene las columnas nuevas.
     return data ? { ...defaultBranding, ...(data as Partial<Branding>) } : defaultBranding
   }
@@ -346,7 +346,7 @@ export async function uploadImage(
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(path, file, { contentType: file.type, upsert: false })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl
   }
 
@@ -370,7 +370,7 @@ export async function getMiPerfil(userId: string): Promise<Perfil | null> {
       .select('*')
       .eq('id', userId)
       .maybeSingle()
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return (data as Perfil) ?? null
   }
   const perfiles = readLocal<Perfil>(KEY.perfiles, [])
@@ -390,7 +390,7 @@ export async function updateMiPerfil(
 ): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('profiles').update(input).eq('id', userId)
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const perfiles = readLocal<Perfil>(KEY.perfiles, [])
@@ -426,7 +426,7 @@ function sumar(movimientos: MovimientoCredito[]): number {
 export async function getSaldo(userId: string): Promise<number> {
   if (supabase) {
     const { data, error } = await supabase.rpc('saldo_creditos')
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return toNumber(data)
   }
   return sumar(demoMovimientos(userId))
@@ -439,7 +439,7 @@ export async function getMovimientos(userId: string): Promise<MovimientoCredito[
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return (data ?? []).map((row) => {
       const item = row as MovimientoCredito
       return { ...item, creditos: toNumber(item.creditos) }
@@ -455,7 +455,7 @@ export async function getSaldosPorUsuario(): Promise<Record<string, number>> {
     const { data, error } = await supabase
       .from('movimientos_creditos')
       .select('user_id, creditos')
-    if (error) throw error
+    if (error) throw new Error(error.message)
     const saldos: Record<string, number> = {}
     for (const row of data ?? []) {
       saldos[row.user_id] = (saldos[row.user_id] ?? 0) + toNumber(row.creditos)
@@ -477,7 +477,7 @@ export async function getRecargas(userId?: string): Promise<Recarga[]> {
       .order('created_at', { ascending: false })
     if (userId) query = query.eq('user_id', userId)
     const { data, error } = await query
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return (data ?? []).map((row) => {
       const item = row as Recarga
       return { ...item, creditos: toNumber(item.creditos) }
@@ -498,7 +498,7 @@ export async function solicitarRecarga(
       p_creditos: creditos,
       p_nota: nota,
     })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return data as Recarga
   }
   const fila: Recarga = {
@@ -520,7 +520,7 @@ export async function solicitarRecarga(
 export async function aprobarRecarga(id: string): Promise<void> {
   if (supabase) {
     const { error } = await supabase.rpc('aprobar_recarga', { p_recarga_id: id })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const todas = readLocal<Recarga>(KEY.recargas, [])
@@ -548,7 +548,7 @@ export async function rechazarRecarga(id: string, motivo = ''): Promise<void> {
       p_recarga_id: id,
       p_motivo: motivo,
     })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return
   }
   const todas = readLocal<Recarga>(KEY.recargas, [])
@@ -567,7 +567,7 @@ export async function pagarConCreditos(
     const { data, error } = await supabase.rpc('pagar_con_creditos', {
       p_producto_id: producto.id,
     })
-    if (error) throw error
+    if (error) throw new Error(error.message)
     return { ...(data as Orden), cliente: undefined, producto }
   }
 
