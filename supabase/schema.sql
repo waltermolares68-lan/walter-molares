@@ -146,6 +146,42 @@ begin
   end loop;
 end $$;
 
+-- Reparación del CHECK de estado: versiones viejas usaban 'aprobado'/'rechazado'.
+-- La app usa 'aprobada'/'rechazada', así que normalizamos y recreamos la restricción.
+do $$
+declare
+  v_attnum int;
+  c record;
+begin
+  select attnum into v_attnum
+    from pg_attribute
+   where attrelid = 'public.recargas'::regclass
+     and attname = 'estado'
+     and not attisdropped;
+
+  if v_attnum is not null then
+    for c in
+      select conname
+        from pg_constraint
+       where conrelid = 'public.recargas'::regclass
+         and contype = 'c'
+         and v_attnum = any(conkey)
+    loop
+      execute format('alter table public.recargas drop constraint %I', c.conname);
+    end loop;
+
+    update public.recargas
+       set estado = case lower(trim(estado))
+         when 'aprobado' then 'aprobada'
+         when 'rechazado' then 'rechazada'
+         when 'pendiente' then 'pendiente'
+         else estado
+       end;
+
+    execute 'alter table public.recargas add constraint recargas_estado_check check (estado in (''pendiente'', ''aprobada'', ''rechazada''))';
+  end if;
+end $$;
+
 -- Reparación de foreign keys: tablas viejas pueden tener user_id apuntando a
 -- public.clientes en vez de auth.users. Se reemplaza por la referencia correcta.
 do $$
