@@ -149,6 +149,7 @@ export function ErrorAlert({ message }: { message: string }) {
 }
 
 const estadoStyles: Record<EstadoOrden, string> = {
+  Pendiente: 'bg-orange-100 text-orange-800',
   Recibido: 'bg-slate-100 text-slate-700',
   Diagnóstico: 'bg-amber-100 text-amber-800',
   'En reparación': 'bg-blue-100 text-blue-800',

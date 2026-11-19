@@ -19,7 +19,7 @@ import {
   updateOrden,
   type OrdenInput,
 } from '../lib/data'
-import { formatDate, formatPrice } from '../lib/format'
+import { formatCreditos, formatDate, formatPrice } from '../lib/format'
 import { useWhatsapp } from '../hooks/useWhatsapp'
 import {
   ESTADOS,
@@ -35,6 +35,8 @@ interface FormState {
   estado: EstadoOrden
   precio: string
   notas: string
+  correo_entrega: string
+  clave_entrega: string
 }
 
 export default function Ordenes() {
@@ -48,7 +50,15 @@ export default function Ordenes() {
   const [filtro, setFiltro] = useState<'Todos' | EstadoOrden>('Todos')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<OrdenConDetalle | null>(null)
-  const [form, setForm] = useState<FormState>({ cliente_id: '', producto_id: '', estado: 'Recibido', precio: '', notas: '' })
+  const [form, setForm] = useState<FormState>({
+    cliente_id: '',
+    producto_id: '',
+    estado: 'Pendiente',
+    precio: '',
+    notas: '',
+    correo_entrega: '',
+    clave_entrega: '',
+  })
   const [saving, setSaving] = useState(false)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -75,9 +85,11 @@ export default function Ordenes() {
     setForm({
       cliente_id: clientes[0]?.id ?? '',
       producto_id: primerProducto?.id ?? '',
-      estado: 'Recibido',
+      estado: 'Pendiente',
       precio: primerProducto ? String(primerProducto.precio) : '',
       notas: '',
+      correo_entrega: '',
+      clave_entrega: '',
     })
     setError('')
     setModalOpen(true)
@@ -91,6 +103,8 @@ export default function Ordenes() {
       estado: orden.estado,
       precio: String(orden.precio),
       notas: orden.notas,
+      correo_entrega: orden.correo_entrega ?? '',
+      clave_entrega: orden.clave_entrega ?? '',
     })
     setError('')
     setModalOpen(true)
@@ -121,6 +135,12 @@ export default function Ordenes() {
       precio: Number(form.precio) || 0,
       creditos_usados: 0,
       notas: form.notas.trim(),
+      correo_entrega: form.correo_entrega.trim(),
+      clave_entrega: form.clave_entrega.trim(),
+      entregado_at:
+        form.estado === 'Recibido'
+          ? (editing?.entregado_at ?? new Date().toISOString())
+          : null,
     }
 
     setSaving(true)
@@ -164,6 +184,7 @@ export default function Ordenes() {
   }
 
   const visibles = ordenes.filter((o) => filtro === 'Todos' || o.estado === filtro)
+  const pendientes = ordenes.filter((o) => o.estado === 'Pendiente').length
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
@@ -203,6 +224,17 @@ export default function Ordenes() {
       {pageError && <div className="mb-4"><ErrorAlert message={pageError} /></div>}
       {error && !modalOpen && <div className="mb-4"><ErrorAlert message={error} /></div>}
 
+      {pendientes > 0 && (
+        <div className="mb-4 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>
+            Hay <strong>{pendientes}</strong> compra(s) pendiente(s). Revisá el estado
+            «Pendiente», cargá el correo y la contraseña de la renta y marcala como
+            «Recibido».
+          </p>
+        </div>
+      )}
+
       <div className="mb-4 flex items-center gap-3">
         <label className="text-sm font-medium text-slate-600" htmlFor="filtro-estado">Filtrar por estado:</label>
         <select id="filtro-estado" className="input max-w-xs" value={filtro} onChange={(e) => setFiltro(e.target.value as 'Todos' | EstadoOrden)}>
@@ -225,6 +257,7 @@ export default function Ordenes() {
                   <th className="px-4 py-3">Cliente</th>
                   <th className="px-4 py-3">Producto / servicio</th>
                   <th className="px-4 py-3">Precio</th>
+                  <th className="px-4 py-3">Créditos</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Acciones</th>
                 </tr>
@@ -242,6 +275,9 @@ export default function Ordenes() {
                       <p className="font-mono text-xs text-slate-400">{orden.producto?.codigo}</p>
                     </td>
                     <td className="px-4 py-3 font-semibold text-slate-800">{formatPrice(orden.precio)}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {orden.creditos_usados > 0 ? formatCreditos(orden.creditos_usados) : '—'}
+                    </td>
                     <td className="px-4 py-3"><EstadoBadge estado={orden.estado} /></td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
@@ -303,6 +339,33 @@ export default function Ordenes() {
           <Field label="Notas internas">
             <textarea className="input min-h-[80px]" value={form.notas} onChange={(e) => updateField('notas', e.target.value)} />
           </Field>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="mb-3 text-sm font-semibold text-slate-800">Datos de la renta</p>
+            <p className="mb-3 text-xs text-slate-500">
+              Cargalos acá y marcá la compra como «Recibido». El cliente los va a ver en
+              «Mi cuenta».
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Correo de la renta">
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="usuario@renta.com"
+                  value={form.correo_entrega}
+                  onChange={(e) => updateField('correo_entrega', e.target.value)}
+                />
+              </Field>
+              <Field label="Contraseña de la renta">
+                <input
+                  type="text"
+                  className="input font-mono"
+                  placeholder="Contraseña"
+                  value={form.clave_entrega}
+                  onChange={(e) => updateField('clave_entrega', e.target.value)}
+                />
+              </Field>
+            </div>
+          </div>
           {error && modalOpen && <ErrorAlert message={error} />}
         </form>
       </Modal>

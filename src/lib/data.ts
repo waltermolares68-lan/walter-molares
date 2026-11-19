@@ -586,10 +586,10 @@ export async function pagarConCreditos(
     codigo,
     cliente_id: 'demo-c1',
     producto_id: producto.id,
-    estado: 'Recibido',
+    estado: 'Pendiente',
     precio: producto.precio,
     creditos_usados: producto.creditos,
-    notas: `Pagado con ${producto.creditos} créditos.`,
+    notas: `Pagado con ${producto.creditos} créditos. Pendiente de entrega.`,
     created_at: now,
     updated_at: now,
   }

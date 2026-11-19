@@ -11,7 +11,7 @@ import {
   WhatsAppLink,
 } from '../components/ui'
 import { createProducto, deleteProducto, getProductos, updateProducto, type ProductoInput } from '../lib/data'
-import { formatPrice } from '../lib/format'
+import { formatCreditos, formatPrice } from '../lib/format'
 import { useWhatsapp } from '../hooks/useWhatsapp'
 import { CATEGORIAS, type Categoria, type Producto } from '../types'
 
@@ -100,7 +100,7 @@ export default function Productos() {
       categoria: form.categoria,
       descripcion: form.descripcion.trim(),
       precio: Number(form.precio) || 0,
-      creditos: Math.max(0, Math.trunc(Number(form.creditos) || 0)),
+      creditos: Math.max(0, Math.round((Number(form.creditos) || 0) * 100) / 100),
       imagen_url: form.imagen_url.trim(),
       activo: form.activo,
     }
@@ -195,7 +195,7 @@ export default function Productos() {
                     <td className="px-4 py-3">
                       {producto.creditos > 0 ? (
                         <span className="badge bg-brand-100 text-brand-700">
-                          {producto.creditos} cr.
+                          {formatCreditos(producto.creditos)} cr.
                         </span>
                       ) : (
                         <span className="text-xs text-slate-400">—</span>
@@ -265,8 +265,8 @@ export default function Productos() {
             <Field label="Precio (AR$)">
               <input type="number" min="0" step="0.01" className="input" value={form.precio} onChange={(e) => updateField('precio', e.target.value)} required />
             </Field>
-            <Field label="Costo en créditos" hint="1 crédito = 1 USD. Viene en 1 para habilitar la compra; poné 0 si solo se consulta por WhatsApp.">
-              <input type="number" min="0" step="1" className="input" value={form.creditos} onChange={(e) => updateField('creditos', e.target.value)} />
+            <Field label="Costo en créditos" hint="1 crédito = 1 USD. Podés poner decimales, por ejemplo 0,99. Poné 0 si solo se consulta por WhatsApp.">
+              <input type="number" min="0" step="0.01" className="input" value={form.creditos} onChange={(e) => updateField('creditos', e.target.value)} />
             </Field>
           </div>
           <Field label="Visible en el catálogo" hint="Desactivá en lugar de eliminar si ya tiene compras.">

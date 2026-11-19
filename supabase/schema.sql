@@ -59,9 +59,12 @@ create table if not exists public.ordenes (
   codigo text not null unique,
   cliente_id uuid not null references public.clientes(id) on delete restrict,
   producto_id uuid not null references public.productos(id) on delete restrict,
-  estado text not null default 'Recibido',
+  estado text not null default 'Pendiente',
   precio numeric(10,2) not null,
   notas text not null default '',
+  correo_entrega text not null default '',
+  clave_entrega text not null default '',
+  entregado_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -71,8 +74,8 @@ create index if not exists ordenes_producto_idx on public.ordenes (producto_id);
 
 -- ------------------------- Créditos -------------------------
 -- 1 crédito = 1 USD. Cada servicio define cuántos créditos cuesta (0 = no pagable con créditos).
-alter table public.productos add column if not exists creditos integer not null default 0;
-alter table public.ordenes add column if not exists creditos_usados integer not null default 0;
+alter table public.productos add column if not exists creditos numeric(10,2) not null default 0;
+alter table public.ordenes add column if not exists creditos_usados numeric(10,2) not null default 0;
 
 -- Un cliente registrado se vincula con su ficha de la tabla clientes.
 alter table public.clientes add column if not exists user_id uuid references auth.users(id) on delete set null;
@@ -95,7 +98,7 @@ create table if not exists public.movimientos_creditos (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   tipo text not null check (tipo in ('recarga', 'compra', 'ajuste')),
-  creditos integer not null,
+  creditos numeric(10,2) not null,
   descripcion text not null default '',
   recarga_id uuid references public.recargas(id) on delete set null,
   orden_id uuid references public.ordenes(id) on delete set null,
@@ -116,11 +119,29 @@ alter table public.recargas add column if not exists revisada_por uuid reference
 
 alter table public.movimientos_creditos add column if not exists user_id uuid references auth.users(id) on delete cascade;
 alter table public.movimientos_creditos add column if not exists tipo text not null default 'ajuste';
-alter table public.movimientos_creditos add column if not exists creditos integer not null default 0;
+alter table public.movimientos_creditos add column if not exists creditos numeric(10,2) not null default 0;
 alter table public.movimientos_creditos add column if not exists descripcion text not null default '';
 alter table public.movimientos_creditos add column if not exists recarga_id uuid references public.recargas(id) on delete set null;
 alter table public.movimientos_creditos add column if not exists orden_id uuid references public.ordenes(id) on delete set null;
 alter table public.movimientos_creditos add column if not exists created_at timestamptz not null default now();
+
+-- Entrega de credenciales de la renta (solo el admin las carga).
+alter table public.ordenes add column if not exists correo_entrega text not null default '';
+alter table public.ordenes add column if not exists clave_entrega text not null default '';
+alter table public.ordenes add column if not exists entregado_at timestamptz;
+
+-- Migración a créditos con decimales (ejemplo: 0,99). No borra datos.
+alter table public.productos alter column creditos type numeric(10,2) using creditos::numeric(10,2);
+alter table public.ordenes alter column creditos_usados type numeric(10,2) using creditos_usados::numeric(10,2);
+alter table public.movimientos_creditos alter column creditos type numeric(10,2) using creditos::numeric(10,2);
+
+alter table public.ordenes alter column estado set default 'Pendiente';
+alter table public.ordenes drop constraint if exists ordenes_estado_check;
+alter table public.ordenes add constraint ordenes_estado_check
+  check (estado in ('Pendiente', 'Recibido', 'Diagnóstico', 'En reparación', 'Listo', 'Entregado', 'Cancelado'));
+
+alter table public.productos drop constraint if exists productos_creditos_no_negativos;
+alter table public.productos add constraint productos_creditos_no_negativos check (creditos >= 0);
 
 -- Si la tabla venía de otra versión, puede tener columnas obligatorias que ya no se usan
 -- (por ejemplo "monto"). Las dejamos opcionales para que los insert nuevos funcionen.
@@ -136,7 +157,8 @@ begin
        and column_name not in (
          'id', 'user_id', 'creditos', 'referencia', 'estado', 'nota',
          'comprobante_url', 'created_at', 'revisada_at', 'revisada_por',
-         'tipo', 'descripcion', 'recarga_id', 'orden_id'
+         'tipo', 'descripcion', 'recarga_id', 'orden_id',
+         'correo_entrega', 'clave_entrega', 'entregado_at'
        )
   loop
     execute format(
@@ -508,13 +530,13 @@ end $$;
 
 -- Saldo disponible del usuario actual.
 create or replace function public.saldo_creditos()
-returns integer
+returns numeric(10,2)
 language sql
 stable
 security definer
 set search_path = public
 as $$
-  select coalesce(sum(creditos), 0)::integer
+  select coalesce(sum(creditos), 0)::numeric(10,2)
     from public.movimientos_creditos
    where user_id = (select auth.uid());
 $$;
@@ -630,7 +652,7 @@ declare
   v_uid uuid := auth.uid();
   v_prod public.productos;
   v_cliente public.clientes;
-  v_saldo integer;
+  v_saldo numeric(10,2);
   v_codigo text;
   v_orden public.ordenes;
 begin
@@ -651,7 +673,7 @@ begin
     raise exception 'No hay una ficha de cliente asociada a tu usuario.';
   end if;
 
-  select coalesce(sum(creditos), 0)::integer into v_saldo
+  select coalesce(sum(creditos), 0)::numeric(10,2) into v_saldo
     from public.movimientos_creditos
    where user_id = v_uid;
 
@@ -665,8 +687,8 @@ begin
     4, '0');
 
   insert into public.ordenes (codigo, cliente_id, producto_id, estado, precio, notas, creditos_usados)
-  values (v_codigo, v_cliente.id, v_prod.id, 'Recibido', v_prod.precio,
-          'Pagado con ' || v_prod.creditos || ' créditos.', v_prod.creditos)
+  values (v_codigo, v_cliente.id, v_prod.id, 'Pendiente', v_prod.precio,
+          'Pagado con ' || v_prod.creditos || ' créditos. Pendiente de entrega.', v_prod.creditos)
   returning * into v_orden;
 
   insert into public.movimientos_creditos (user_id, tipo, creditos, descripcion, orden_id)
@@ -675,6 +697,103 @@ begin
   return v_orden;
 end;
 $$;
+
+-- ==================== Aviso por email al administrador ====================
+-- Se dispara cuando se crea una compra en estado «Pendiente».
+-- Necesitás dos secretos en Supabase Vault: RESEND_API_KEY y RESEND_FROM.
+-- Si no están cargados, la compra se crea igual y solo se muestra un aviso en el panel.
+do $$
+begin
+  create extension if not exists pg_net;
+exception when others then
+  raise notice 'No se pudo habilitar pg_net: %', sqlerrm;
+end $$;
+
+create or replace function public.notificar_compra_pendiente()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_api_key text;
+  v_from text;
+  v_admin_email text;
+  v_cliente_nombre text;
+  v_producto_nombre text;
+  v_html text;
+  v_payload jsonb;
+begin
+  if new.estado <> 'Pendiente' then
+    return new;
+  end if;
+
+  select decrypted_secret into v_api_key
+    from vault.decrypted_secrets where name = 'RESEND_API_KEY' limit 1;
+  select decrypted_secret into v_from
+    from vault.decrypted_secrets where name = 'RESEND_FROM' limit 1;
+
+  if coalesce(v_api_key, '') = '' or coalesce(v_from, '') = '' then
+    raise notice 'Aviso por email no configurado: cargá RESEND_API_KEY y RESEND_FROM en Supabase Vault.';
+    return new;
+  end if;
+
+  -- El destinatario es el email del perfil admin más antiguo.
+  select u.email into v_admin_email
+    from public.profiles p
+    join auth.users u on u.id = p.id
+   where p.role = 'admin'
+   order by u.created_at asc
+   limit 1;
+
+  if coalesce(v_admin_email, '') = '' then
+    raise notice 'No hay perfil admin con email para enviar el aviso.';
+    return new;
+  end if;
+
+  select nombre into v_cliente_nombre from public.clientes where id = new.cliente_id;
+  select nombre into v_producto_nombre from public.productos where id = new.producto_id;
+
+  v_html := '<div style="font-family:Arial,sans-serif">'
+         || '<h2>Nueva compra pendiente</h2>'
+         || '<p><strong>Código:</strong> ' || coalesce(new.codigo, '') || '</p>'
+         || '<p><strong>Cliente:</strong> ' || coalesce(v_cliente_nombre, '—') || '</p>'
+         || '<p><strong>Servicio:</strong> ' || coalesce(v_producto_nombre, '—') || '</p>'
+         || '<p><strong>Precio:</strong> $ ' || coalesce(new.precio::text, '0') || '</p>'
+         || '<p><strong>Créditos usados:</strong> ' || coalesce(new.creditos_usados::text, '0') || '</p>'
+         || '<p>Ingresá al panel, cargá el correo y la contraseña de la renta y marcá la compra como «Recibido».</p>'
+         || '</div>';
+
+  v_payload := jsonb_build_object(
+    'from', v_from,
+    'to', jsonb_build_array(v_admin_email),
+    'subject', 'Nueva compra pendiente ' || coalesce(new.codigo, ''),
+    'html', v_html
+  );
+
+  perform net.http_post(
+    url := 'https://api.resend.com/emails',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer ' || v_api_key,
+      'Content-Type', 'application/json'
+    ),
+    body := v_payload::text
+  );
+
+  return new;
+exception when others then
+  -- Nunca frenamos una compra por un problema del correo.
+  raise notice 'No se pudo enviar el aviso por email: %', sqlerrm;
+  return new;
+end;
+$$;
+
+drop trigger if exists ordenes_notificar_compra_pendiente on public.ordenes;
+create trigger ordenes_notificar_compra_pendiente
+  after insert on public.ordenes
+  for each row
+  when (new.estado = 'Pendiente')
+  execute function public.notificar_compra_pendiente();
 
 -- Permisos de tabla (Supabase ya los da por defecto; los repetimos para asegurar).
 grant select, insert on public.recargas to authenticated;

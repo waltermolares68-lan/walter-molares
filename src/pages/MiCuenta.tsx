@@ -12,7 +12,7 @@ import {
   getSaldo,
   solicitarRecarga,
 } from '../lib/data'
-import { formatDate, formatPrice } from '../lib/format'
+import { formatCreditos, formatDate, formatPrice } from '../lib/format'
 import {
   MONTOS_RECARGA,
   type MovimientoCredito,
@@ -123,7 +123,7 @@ export default function MiCuenta() {
           <div className="mb-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl bg-brand-700 p-6 text-white shadow-sm">
               <p className="text-sm text-brand-100">Saldo disponible</p>
-              <p className="mt-1 text-4xl font-extrabold">{saldo}</p>
+              <p className="mt-1 text-4xl font-extrabold">{formatCreditos(saldo)}</p>
               <p className="mt-1 text-xs text-brand-100">1 crédito = 1 USD</p>
               <button
                 type="button"
@@ -196,7 +196,7 @@ export default function MiCuenta() {
                         }`}
                       >
                         {m.creditos > 0 ? '+' : ''}
-                        {m.creditos}
+                        {formatCreditos(m.creditos)}
                       </span>
                     </li>
                   ))}
@@ -225,8 +225,26 @@ export default function MiCuenta() {
                       <p className="mt-0.5 text-xs text-slate-400">
                         {orden.codigo} · {formatDate(orden.created_at)} ·{' '}
                         {formatPrice(orden.precio)}
-                        {orden.creditos_usados > 0 && ` · ${orden.creditos_usados} créditos`}
+                        {orden.creditos_usados > 0 && ` · ${formatCreditos(orden.creditos_usados)} créditos`}
                       </p>
+                      {(orden.estado === 'Recibido' || orden.estado === 'Entregado') &&
+                        (orden.correo_entrega || orden.clave_entrega) && (
+                          <div className="mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+                            <p className="font-semibold">Datos de tu renta</p>
+                            {orden.correo_entrega && (
+                              <p>
+                                Correo:{' '}
+                                <span className="font-mono">{orden.correo_entrega}</span>
+                              </p>
+                            )}
+                            {orden.clave_entrega && (
+                              <p>
+                                Contraseña:{' '}
+                                <span className="font-mono">{orden.clave_entrega}</span>
+                              </p>
+                            )}
+                          </div>
+                        )}
                     </li>
                   ))}
                 </ul>

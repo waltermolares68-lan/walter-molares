@@ -1,6 +1,7 @@
 export type Categoria = 'Reparación' | 'Repuesto' | 'Accesorio' | 'Otro'
 
 export type EstadoOrden =
+  | 'Pendiente'
   | 'Recibido'
   | 'Diagnóstico'
   | 'En reparación'
@@ -11,6 +12,7 @@ export type EstadoOrden =
 export const CATEGORIAS: Categoria[] = ['Reparación', 'Repuesto', 'Accesorio', 'Otro']
 
 export const ESTADOS: EstadoOrden[] = [
+  'Pendiente',
   'Recibido',
   'Diagnóstico',
   'En reparación',
@@ -64,7 +66,7 @@ export interface Producto {
   categoria: Categoria
   descripcion: string
   precio: number
-  /** Costo en créditos. 0 = solo se consulta por WhatsApp. */
+  /** Costo en créditos. Admite decimales (ejemplo: 0,99). 0 = solo WhatsApp. */
   creditos: number
   imagen_url: string
   activo: boolean
@@ -90,6 +92,10 @@ export interface Orden {
   precio: number
   creditos_usados: number
   notas: string
+  /** Datos de la renta que el admin entrega al cliente. */
+  correo_entrega?: string
+  clave_entrega?: string
+  entregado_at?: string | null
   created_at?: string
   updated_at?: string
 }

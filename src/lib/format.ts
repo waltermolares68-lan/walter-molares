@@ -9,6 +9,14 @@ export function formatPrice(value: number): string {
   }).format(Number(value) || 0)
 }
 
+export function formatCreditos(value: number): string {
+  const numero = Number(value) || 0
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: Number.isInteger(numero) ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(numero)
+}
+
 export function formatDate(value?: string): string {
   if (!value) return '—'
   const date = new Date(value)

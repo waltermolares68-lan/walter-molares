@@ -5,7 +5,7 @@ import type { Producto } from '../types'
 import { useAuth } from '../context/AuthContext'
 import { useWhatsapp } from '../hooks/useWhatsapp'
 import { pagarConCreditos } from '../lib/data'
-import { formatPrice } from '../lib/format'
+import { formatCreditos, formatPrice } from '../lib/format'
 import { WhatsAppLink } from './ui'
 
 export function ProductCard({ producto }: { producto: Producto }) {
@@ -60,7 +60,7 @@ export function ProductCard({ producto }: { producto: Producto }) {
         </span>
         {producto.creditos > 0 && (
           <span className="absolute right-3 top-3 rounded-md bg-brand-700 px-2 py-1 text-[11px] font-bold text-white shadow-sm">
-            {producto.creditos} créditos
+            {formatCreditos(producto.creditos)} créditos
           </span>
         )}
       </div>
@@ -107,7 +107,7 @@ export function ProductCard({ producto }: { producto: Producto }) {
                 ? 'Ingresá para comprar'
                 : comprando
                   ? 'Procesando…'
-                  : `Comprar con ${producto.creditos} créditos`}
+                  : `Comprar con ${formatCreditos(producto.creditos)} créditos`}
           </button>
           <WhatsAppLink
             href={wa.producto(producto)}
