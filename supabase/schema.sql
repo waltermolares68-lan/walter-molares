@@ -529,6 +529,8 @@ begin
 end $$;
 
 -- Saldo disponible del usuario actual.
+-- Cambió de integer a numeric(10,2): Postgres exige borrarla antes de recrearla.
+drop function if exists public.saldo_creditos();
 create or replace function public.saldo_creditos()
 returns numeric(10,2)
 language sql
