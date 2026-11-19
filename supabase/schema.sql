@@ -102,6 +102,26 @@ create table if not exists public.movimientos_creditos (
   created_at timestamptz not null default now()
 );
 
+-- Reparación: si estas tablas ya existían de una versión anterior, agregamos
+-- las columnas que falten sin borrar ningún dato.
+alter table public.recargas add column if not exists user_id uuid references auth.users(id) on delete cascade;
+alter table public.recargas add column if not exists creditos integer not null default 0;
+alter table public.recargas add column if not exists referencia text not null default '';
+alter table public.recargas add column if not exists estado text not null default 'pendiente';
+alter table public.recargas add column if not exists nota text not null default '';
+alter table public.recargas add column if not exists comprobante_url text not null default '';
+alter table public.recargas add column if not exists created_at timestamptz not null default now();
+alter table public.recargas add column if not exists revisada_at timestamptz;
+alter table public.recargas add column if not exists revisada_por uuid references auth.users(id);
+
+alter table public.movimientos_creditos add column if not exists user_id uuid references auth.users(id) on delete cascade;
+alter table public.movimientos_creditos add column if not exists tipo text not null default 'ajuste';
+alter table public.movimientos_creditos add column if not exists creditos integer not null default 0;
+alter table public.movimientos_creditos add column if not exists descripcion text not null default '';
+alter table public.movimientos_creditos add column if not exists recarga_id uuid references public.recargas(id) on delete set null;
+alter table public.movimientos_creditos add column if not exists orden_id uuid references public.ordenes(id) on delete set null;
+alter table public.movimientos_creditos add column if not exists created_at timestamptz not null default now();
+
 create index if not exists movimientos_user_idx on public.movimientos_creditos (user_id);
 create index if not exists recargas_user_idx on public.recargas (user_id);
 
