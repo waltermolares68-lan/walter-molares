@@ -122,6 +122,30 @@ alter table public.movimientos_creditos add column if not exists recarga_id uuid
 alter table public.movimientos_creditos add column if not exists orden_id uuid references public.ordenes(id) on delete set null;
 alter table public.movimientos_creditos add column if not exists created_at timestamptz not null default now();
 
+-- Si la tabla venía de otra versión, puede tener columnas obligatorias que ya no se usan
+-- (por ejemplo "monto"). Las dejamos opcionales para que los insert nuevos funcionen.
+do $$
+declare
+  c record;
+begin
+  for c in
+    select table_name, column_name
+      from information_schema.columns
+     where table_schema = 'public'
+       and table_name in ('recargas', 'movimientos_creditos')
+       and column_name not in (
+         'id', 'user_id', 'creditos', 'referencia', 'estado', 'nota',
+         'comprobante_url', 'created_at', 'revisada_at', 'revisada_por',
+         'tipo', 'descripcion', 'recarga_id', 'orden_id'
+       )
+  loop
+    execute format(
+      'alter table public.%I alter column %I drop not null',
+      c.table_name, c.column_name
+    );
+  end loop;
+end $$;
+
 create index if not exists movimientos_user_idx on public.movimientos_creditos (user_id);
 create index if not exists recargas_user_idx on public.recargas (user_id);
 
