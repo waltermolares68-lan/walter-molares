@@ -160,6 +160,9 @@ begin
      and not attisdropped;
 
   if v_attnum is not null then
+    -- El nombre viejo conocido se elimina siempre.
+    execute 'alter table public.recargas drop constraint if exists recargas_estado_check';
+
     for c in
       select conname
         from pg_constraint
