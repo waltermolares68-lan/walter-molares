@@ -30,7 +30,7 @@
     <div class="head">
       <div>
         <h2>1. Esquema completo (corregido)</h2>
-        <small>Créditos decimales, compras pendientes, credenciales y aviso por email. No borra datos.</small>
+        <small>Créditos decimales, compras pendientes, credenciales y avisos por email al admin y al cliente. No borra datos.</small>
       </div>
       <button type="button" onclick="copiar('esquema', this)">Copiar</button>
     </div>
@@ -736,7 +736,7 @@ begin
 end;
 $$;
 
--- ==================== Aviso por email al administrador ====================
+-- ==================== Avisos por email: administrador y cliente ====================
 -- Se dispara cuando se crea una compra en estado «Pendiente».
 -- Necesitás dos secretos en Supabase Vault: RESEND_API_KEY y RESEND_FROM.
 -- Si no están cargados, la compra se crea igual y solo se muestra un aviso en el panel.
@@ -757,10 +757,12 @@ declare
   v_api_key text;
   v_from text;
   v_admin_email text;
+  v_cliente_email text;
   v_cliente_nombre text;
   v_producto_nombre text;
   v_html text;
   v_payload jsonb;
+  v_sitio text := 'https://waltermolares68-lan.github.io/walter-molares/';
 begin
   if new.estado &lt;&gt; 'Pendiente' then
     return new;
@@ -776,7 +778,7 @@ begin
     return new;
   end if;
 
-  -- El destinatario es el email del perfil admin más antiguo.
+  -- Destinatario 1: el email del perfil admin más antiguo.
   select u.email into v_admin_email
     from public.profiles p
     join auth.users u on u.id = p.id
@@ -784,39 +786,77 @@ begin
    order by u.created_at asc
    limit 1;
 
-  if coalesce(v_admin_email, '') = '' then
-    raise notice 'No hay perfil admin con email para enviar el aviso.';
-    return new;
-  end if;
+  -- Destinatario 2: el email con el que se registró el cliente de la orden.
+  select c.nombre, u.email
+    into v_cliente_nombre, v_cliente_email
+    from public.clientes c
+    left join auth.users u on u.id = c.user_id
+   where c.id = new.cliente_id;
 
-  select nombre into v_cliente_nombre from public.clientes where id = new.cliente_id;
   select nombre into v_producto_nombre from public.productos where id = new.producto_id;
 
-  v_html := '&lt;div style=&quot;font-family:Arial,sans-serif&quot;&gt;'
-         || '&lt;h2&gt;Nueva compra pendiente&lt;/h2&gt;'
-         || '&lt;p&gt;&lt;strong&gt;Código:&lt;/strong&gt; ' || coalesce(new.codigo, '') || '&lt;/p&gt;'
-         || '&lt;p&gt;&lt;strong&gt;Cliente:&lt;/strong&gt; ' || coalesce(v_cliente_nombre, '—') || '&lt;/p&gt;'
-         || '&lt;p&gt;&lt;strong&gt;Servicio:&lt;/strong&gt; ' || coalesce(v_producto_nombre, '—') || '&lt;/p&gt;'
-         || '&lt;p&gt;&lt;strong&gt;Precio:&lt;/strong&gt; $ ' || coalesce(new.precio::text, '0') || '&lt;/p&gt;'
-         || '&lt;p&gt;&lt;strong&gt;Créditos usados:&lt;/strong&gt; ' || coalesce(new.creditos_usados::text, '0') || '&lt;/p&gt;'
-         || '&lt;p&gt;Ingresá al panel, cargá el correo y la contraseña de la renta y marcá la compra como «Recibido».&lt;/p&gt;'
-         || '&lt;/div&gt;';
+  -- 1) Aviso para el administrador.
+  if coalesce(v_admin_email, '') &lt;&gt; '' then
+    v_html := '&lt;div style=&quot;font-family:Arial,sans-serif&quot;&gt;'
+           || '&lt;h2&gt;Nueva compra pendiente&lt;/h2&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Código:&lt;/strong&gt; ' || coalesce(new.codigo, '') || '&lt;/p&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Cliente:&lt;/strong&gt; ' || coalesce(v_cliente_nombre, '—') || '&lt;/p&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Servicio:&lt;/strong&gt; ' || coalesce(v_producto_nombre, '—') || '&lt;/p&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Precio:&lt;/strong&gt; $ ' || coalesce(new.precio::text, '0') || '&lt;/p&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Créditos usados:&lt;/strong&gt; ' || coalesce(new.creditos_usados::text, '0') || '&lt;/p&gt;'
+           || '&lt;p&gt;Ingresá al panel, cargá el correo y la contraseña de la renta y marcá la compra como «Recibido».&lt;/p&gt;'
+           || '&lt;/div&gt;';
 
-  v_payload := jsonb_build_object(
-    'from', v_from,
-    'to', jsonb_build_array(v_admin_email),
-    'subject', 'Nueva compra pendiente ' || coalesce(new.codigo, ''),
-    'html', v_html
-  );
+    v_payload := jsonb_build_object(
+      'from', v_from,
+      'to', jsonb_build_array(v_admin_email),
+      'subject', 'Nueva compra pendiente ' || coalesce(new.codigo, ''),
+      'html', v_html
+    );
 
-  perform net.http_post(
-    url := 'https://api.resend.com/emails',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer ' || v_api_key,
-      'Content-Type', 'application/json'
-    ),
-    body := v_payload
-  );
+    perform net.http_post(
+      url := 'https://api.resend.com/emails',
+      headers := jsonb_build_object(
+        'Authorization', 'Bearer ' || v_api_key,
+        'Content-Type', 'application/json'
+      ),
+      body := v_payload
+    );
+  else
+    raise notice 'No hay perfil admin con email para enviar el aviso.';
+  end if;
+
+  -- 2) Confirmación para el cliente, al correo con el que se registró en la web.
+  if coalesce(v_cliente_email, '') &lt;&gt; '' then
+    v_html := '&lt;div style=&quot;font-family:Arial,sans-serif&quot;&gt;'
+           || '&lt;h2&gt;¡Gracias por tu compra!&lt;/h2&gt;'
+           || '&lt;p&gt;Hola ' || coalesce(nullif(v_cliente_nombre, ''), 'cliente') || ':&lt;/p&gt;'
+           || '&lt;p&gt;Compraste &lt;strong&gt;' || coalesce(v_producto_nombre, '—') || '&lt;/strong&gt;.&lt;/p&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Código:&lt;/strong&gt; ' || coalesce(new.codigo, '') || '&lt;/p&gt;'
+           || '&lt;p&gt;&lt;strong&gt;Créditos usados:&lt;/strong&gt; ' || coalesce(new.creditos_usados::text, '0') || '&lt;/p&gt;'
+           || '&lt;p&gt;Ingresá a &lt;strong&gt;Mi cuenta&lt;/strong&gt; en la web para ver el estado y los resultados de tu servicio:&lt;/p&gt;'
+           || '&lt;p&gt;&lt;a href=&quot;' || v_sitio || '&quot;&gt;' || v_sitio || '&lt;/a&gt;&lt;/p&gt;'
+           || '&lt;p&gt;Cuando el servicio esté listo, vas a ver el correo y la contraseña de la renta en Mi cuenta.&lt;/p&gt;'
+           || '&lt;/div&gt;';
+
+    v_payload := jsonb_build_object(
+      'from', v_from,
+      'to', jsonb_build_array(v_cliente_email),
+      'subject', 'Compra confirmada ' || coalesce(new.codigo, '') || ' - Servicio Tecnico Walter Molares',
+      'html', v_html
+    );
+
+    perform net.http_post(
+      url := 'https://api.resend.com/emails',
+      headers := jsonb_build_object(
+        'Authorization', 'Bearer ' || v_api_key,
+        'Content-Type', 'application/json'
+      ),
+      body := v_payload
+    );
+  else
+    raise notice 'La orden no tiene un cliente registrado con email para enviar la confirmación.';
+  end if;
 
   return new;
 exception when others then
@@ -907,6 +947,11 @@ select vault.create_secret(
   'Servicio Tecnico Walter Molares &lt;onboarding@resend.dev&gt;',
   'RESEND_FROM'
 );
+
+-- IMPORTANTE: onboarding@resend.dev solo entrega al correo de tu cuenta de Resend.
+-- Para que el cliente reciba su confirmación, verificá un dominio en Resend
+-- y reemplazá el remitente por uno propio, por ejemplo:
+-- 'Servicio Tecnico Walter Molares &lt;no-reply@TU_DOMINIO_VERIFICADO&gt;'
 </code></pre>
   </section>
 

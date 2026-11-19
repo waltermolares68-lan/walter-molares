@@ -42,6 +42,11 @@ select vault.create_secret(
   'Servicio Tecnico Walter Molares <onboarding@resend.dev>',
   'RESEND_FROM'
 );
+
+-- IMPORTANTE: onboarding@resend.dev solo entrega al correo de tu cuenta de Resend.
+-- Para que el cliente reciba su confirmación, verificá un dominio en Resend
+-- y reemplazá el remitente por uno propio, por ejemplo:
+-- 'Servicio Tecnico Walter Molares <no-reply@TU_DOMINIO_VERIFICADO>'
 `
 
 const prueba = `-- Prueba directa: envía un correo a tu email de admin.
@@ -104,7 +109,7 @@ const html = `<!doctype html>
     <div class="head">
       <div>
         <h2>1. Esquema completo (corregido)</h2>
-        <small>Créditos decimales, compras pendientes, credenciales y aviso por email. No borra datos.</small>
+        <small>Créditos decimales, compras pendientes, credenciales y avisos por email al admin y al cliente. No borra datos.</small>
       </div>
       <button type="button" onclick="copiar('esquema', this)">Copiar</button>
     </div>

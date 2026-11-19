@@ -44,6 +44,10 @@ Para salir, tocá **«Salir»** en el menú superior. Los clientes pueden crear 
 
 **Cómo paga un servicio:** el cliente busca el servicio en el catálogo y toca **«Comprar con X créditos»** (solo aparece si el servicio tiene créditos cargados). La compra se registra sola y el saldo se descuenta. Si no alcanza, lo llevamos a recargar.
 
+**Correos de una compra:** se envían dos. Vos recibís **«Nueva compra pendiente»** para cargar las credenciales de la renta. El cliente recibe **«Compra confirmada»** al correo con el que se registró, con el producto comprado y un link a **Mi cuenta**, donde ve el estado y los resultados de su servicio. Si el cliente fue cargado a mano y no tiene usuario web, solo llega el tuyo.
+
+> **Importante para el correo del cliente:** con `onboarding@resend.dev` solo se entrega al correo de la cuenta de Resend (el tuyo). Para que llegue a cualquier cliente, verificá un dominio en **Resend → Domains** y cambiá `RESEND_FROM` a algo como `Servicio Tecnico Walter Molares <no-reply@TU_DOMINIO_VERIFICADO>`. El bloque 3 de la página SQL tiene la aclaración.
+
 **Cómo recarga:**
 
 1. En **Mi cuenta** → **«Recargar créditos»**, elige el monto y tocá **«Continuar»**.
