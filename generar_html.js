@@ -77,6 +77,17 @@ begin
 end $$;
 `
 
+const remitente = `-- Solo cuando tu dominio ya esté verificado en Resend.
+-- Reemplazá el remitente por una dirección de ese dominio.
+-- No toca la API key.
+delete from vault.secrets where name = 'RESEND_FROM';
+
+select vault.create_secret(
+  'Servicio Tecnico Walter Molares <no-reply@TU_DOMINIO_VERIFICADO>',
+  'RESEND_FROM'
+);
+`
+
 const html = `<!doctype html>
 <html lang="es">
 <head>
@@ -148,6 +159,18 @@ const html = `<!doctype html>
     </div>
     <pre><code id="prueba">${esc(prueba)}</code></pre>
     <div class="nota">Si este correo llega pero el aviso de compra no, el problema está en el disparador, no en Resend.</div>
+  </section>
+
+  <section>
+    <div class="head">
+      <div>
+        <h2>5. Cambiar el remitente cuando tu dominio esté verificado</h2>
+        <small>Para que el correo del cliente llegue a cualquier email. No toca la API key.</small>
+      </div>
+      <button type="button" onclick="copiar('remitente', this)">Copiar</button>
+    </div>
+    <pre><code id="remitente">${esc(remitente)}</code></pre>
+    <div class="nota">Con onboarding@resend.dev solo llega a tu correo de Resend. Usá este bloque recién cuando Resend diga que tu dominio está verificado.</div>
   </section>
 </main>
 <script>
